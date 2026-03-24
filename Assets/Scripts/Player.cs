@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor.Build;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -10,14 +11,21 @@ public class Player : MonoBehaviour
     public Tilemap tilemap; // Swap for a global varaible later.
 
     [SerializeField] private int speed = 3;
+    [SerializeField] private int dashSpeed = 4;
+    [SerializeField] private int dashDistance = 2;
+    [SerializeField] private float dashCooldown = 8f;
+    [SerializeField] private float dashClock;
 
     [SerializeField] private Vector3Int direction = new(1, 0);
     [SerializeField] private Vector3Int storedDirection = new(1, 0);
-    [SerializeField] private Vector3Int adjacentTile;
+    private Vector3Int adjacentTile;
+    private Vector3Int dashTarget;
 
     [SerializeField] private bool isMoving = false;
+    [SerializeField] private bool wantToDash = false;
 
     private Rigidbody2D rb;
+    private SpriteRenderer sr;
 
     private Vector3Int MyGridPos => grid.WorldToCell(transform.position);
     private 
@@ -26,13 +34,23 @@ public class Player : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        sr = GetComponent<SpriteRenderer>();
+    }
+
+    private void Update()
+    {
+        if (dashClock > 0)
+            DashTimer();
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
         InputReader();
-        StartCoroutine(Move());
+        if (wantToDash && dashClock <= 0)
+            StartCoroutine(Dash());
+        else
+            StartCoroutine(Move());
     }
 
     private IEnumerator Move()
@@ -73,7 +91,44 @@ public class Player : MonoBehaviour
         isMoving = false;
     }
 
-    void InputReader()
+    private IEnumerator Dash()
+    {
+        if (isMoving)
+            yield break;
+
+        isMoving = true;
+
+        adjacentTile = MyGridPos;
+
+        for (int i = 0; i < dashDistance; i++)
+        {
+            dashTarget = adjacentTile;
+            adjacentTile += storedDirection;
+
+            if (tilemap.GetColliderType(adjacentTile) != Tile.ColliderType.None)
+                break;
+        }
+
+        while ((transform.position - grid.GetCellCenterWorld(dashTarget)).sqrMagnitude > 0.001f)
+        {
+            sr.color = Color.red;
+            Vector2 newPos = Vector2.MoveTowards(transform.position, grid.GetCellCenterWorld(dashTarget), dashSpeed * Time.fixedDeltaTime);
+            rb.MovePosition(newPos);
+            yield return new WaitForFixedUpdate();
+        }
+
+        sr.color = Color.white;
+        dashClock = dashCooldown;
+        wantToDash = false;
+        isMoving = false;
+    }
+
+    private void DashTimer()
+    {
+        dashClock -= Time.deltaTime;
+    }
+
+    private void InputReader()
     {
         // Record the player's last directional input
         if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
@@ -81,5 +136,7 @@ public class Player : MonoBehaviour
             direction.x = Mathf.RoundToInt(Input.GetAxisRaw("Horizontal"));
             direction.y = Mathf.RoundToInt(Input.GetAxisRaw("Vertical"));
         }
+        if (Input.GetKey(KeyCode.LeftShift) && dashClock <= 0)
+            wantToDash = true;
     }
 }
