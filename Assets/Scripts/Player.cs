@@ -10,10 +10,16 @@ public class Player : MonoBehaviour
     public Grid grid; // Swap for a global variable later.
     public Tilemap tilemap; // Swap for a global varaible later.
 
-    [SerializeField] private int speed = 3;
-    [SerializeField] private int dashSpeed = 4;
+    //Speed should be public since it changes dynamically with equip load
+    //Light load (default, 0-24%) = 7
+    //Med light load (25-49%) = 6
+    //Med heavy load (50-74%) = 5
+    //Heavy load (75-99%) = 4
+    //Overburdened (100%) = 2
+    [SerializeField] public int speed = 7;
+    [SerializeField] private int dashSpeedMultiplier = 2; //Changed this slightly to work with dynamic speed 
     [SerializeField] private int dashDistance = 2;
-    [SerializeField] private float dashCooldown = 8f;
+    [SerializeField] private float dashCooldown = 1f;
     [SerializeField] private float dashClock;
 
     [SerializeField] private Vector3Int direction = new(1, 0);
@@ -47,7 +53,8 @@ public class Player : MonoBehaviour
     void FixedUpdate()
     {
         InputReader();
-        if (wantToDash && dashClock <= 0)
+        if (wantToDash && dashClock <= 0 && speed >= 4) //speed>=4 makes sure dashing is impossible when overburdened
+                                                        //this should be changed to directly check the equip load variable once that exists
             StartCoroutine(Dash());
         else
             StartCoroutine(Move());
@@ -112,7 +119,7 @@ public class Player : MonoBehaviour
         while ((transform.position - grid.GetCellCenterWorld(dashTarget)).sqrMagnitude > 0.001f)
         {
             sr.color = Color.red;
-            Vector2 newPos = Vector2.MoveTowards(transform.position, grid.GetCellCenterWorld(dashTarget), dashSpeed * Time.fixedDeltaTime);
+            Vector2 newPos = Vector2.MoveTowards(transform.position, grid.GetCellCenterWorld(dashTarget), (speed * dashSpeedMultiplier) * Time.fixedDeltaTime);
             rb.MovePosition(newPos);
             yield return new WaitForFixedUpdate();
         }

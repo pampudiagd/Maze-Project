@@ -481,15 +481,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   grid: {fileID: 691516858}
   tilemap: {fileID: 1773051354}
-  speed: 3
-  dashSpeed: 6
+  speed: 7
+  dashSpeedMultiplier: 2
   dashDistance: 3
-  dashCooldown: 3
+  dashCooldown: 1
   dashClock: 0
   direction: {x: 1, y: 0, z: 0}
   storedDirection: {x: 1, y: 0, z: 0}
-  adjacentTile: {x: 0, y: 0, z: 0}
-  dashTarget: {x: 0, y: 0, z: 0}
   isMoving: 0
   wantToDash: 0
 --- !u!50 &1001120456
