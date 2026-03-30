@@ -18,7 +18,7 @@ public class Player : MonoBehaviour
 
     [SerializeField] private Vector3Int direction = new(1, 0);
     [SerializeField] private Vector3Int storedDirection = new(1, 0);
-    private Vector3Int adjacentTile;
+    [SerializeField] private Vector3Int adjacentTile;
     private Vector3Int dashTarget;
 
     [SerializeField] private bool isMoving = false;
@@ -28,7 +28,6 @@ public class Player : MonoBehaviour
     private SpriteRenderer sr;
 
     private Vector3Int MyGridPos => grid.WorldToCell(transform.position);
-    private 
 
     // Start is called before the first frame update
     void Start()
@@ -75,7 +74,7 @@ public class Player : MonoBehaviour
             else if (direction.x < 0)
                 transform.rotation = Quaternion.Euler(0, 0, 90);
         }
-
+        
         adjacentTile = MyGridPos + storedDirection; // Updates the tile the player is trying to move into
 
         if (tilemap.GetColliderType(adjacentTile) == Tile.ColliderType.None)
@@ -131,10 +130,15 @@ public class Player : MonoBehaviour
     private void InputReader()
     {
         // Record the player's last directional input
-        if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
+        if (Input.GetAxisRaw("Horizontal") != 0)
         {
             direction.x = Mathf.RoundToInt(Input.GetAxisRaw("Horizontal"));
+            direction.y = 0;
+        }
+        else if (Input.GetAxisRaw("Vertical") != 0)
+        {
             direction.y = Mathf.RoundToInt(Input.GetAxisRaw("Vertical"));
+            direction.x = 0;
         }
         if (Input.GetKey(KeyCode.LeftShift) && dashClock <= 0)
             wantToDash = true;
