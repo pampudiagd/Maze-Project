@@ -32,6 +32,9 @@ public class PauseMenu : MonoBehaviour
     public RefreshRate currentRefreshRate;
     public int currentResolutionIndex = 0;
 
+    //Boolean for currently initializing stuff in Start()
+    public bool isInitializing = true;
+
     //Resume and Pause functions
 
     // R E S U M E
@@ -125,9 +128,11 @@ public class PauseMenu : MonoBehaviour
         sfxMixer.SetFloat("sfxVolume", sfxVolume);
     }
 
-    // R E S O L U T I O N
+    // S E T   R E S O L U T I O N
     public void SetResolution(int resolutionIndex)
     {
+        if (isInitializing) return; //Prevents this accidentally being called in Start()
+
         Resolution resolution = filteredResolutions[resolutionIndex];
         Screen.SetResolution(resolution.width, resolution.height, true); //The boolean is for fullscreen or not
     }
@@ -138,6 +143,9 @@ public class PauseMenu : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+
+        isInitializing = true;
+
         //Debug: Assign pause and options menu UI if null
         if (pauseMenuUI == null)
         {
@@ -214,6 +222,8 @@ public class PauseMenu : MonoBehaviour
         resolutionDropdown.RefreshShownValue();
 
         //Resolution stuff is now over.
+
+        isInitializing = false;
 
         //Start game in unpaused state
         Resume();
