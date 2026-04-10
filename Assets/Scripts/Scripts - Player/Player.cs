@@ -4,11 +4,14 @@ using Unity.VisualScripting;
 using UnityEditor.Build;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using System;
 
 public class Player : MonoBehaviour
 {
     public Grid grid; // Swap for a global variable later.
     public Tilemap tilemap; // Swap for a global varaible later.
+
+    public int coinCount = 0;
 
     //Speed should be public since it changes dynamically with equip load
     //Light load (default, 0-24%) = 7
@@ -40,6 +43,16 @@ public class Player : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
+    }
+
+    private void OnEnable()
+    {
+        EventManager.OnCollectCoin += AddCoin;
+    }
+
+    private void OnDisable()
+    {
+        EventManager.OnCollectCoin -= AddCoin;
     }
 
     private void Update()
@@ -133,6 +146,8 @@ public class Player : MonoBehaviour
     {
         dashClock -= Time.deltaTime;
     }
+
+    private void AddCoin() => coinCount++;
 
     private void InputReader()
     {
