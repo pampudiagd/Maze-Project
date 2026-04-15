@@ -19,7 +19,7 @@ public class Player : MonoBehaviour
     //Med heavy load (50-74%) = 5
     //Heavy load (75-99%) = 4
     //Overburdened (100%) = 2
-    [SerializeField] public int speed = 7;
+    public int speed = 7;
     [SerializeField] private int dashSpeedMultiplier = 2; //Changed this slightly to work with dynamic speed 
     [SerializeField] private int dashDistance = 2;
     [SerializeField] private float dashCooldown = 1f;
@@ -81,7 +81,7 @@ public class Player : MonoBehaviour
 
         // Check if the latest input direction points to an open tile
         if (tilemap.GetColliderType(MyGridPos + direction) == Tile.ColliderType.None)
-        { 
+        {
             storedDirection = direction; // Updates the Vector used to determine the next tile for movement
 
             // Set the player's rotation based on the last recorded directional input
@@ -94,7 +94,7 @@ public class Player : MonoBehaviour
             else if (direction.x < 0)
                 transform.rotation = Quaternion.Euler(0, 0, 90);
         }
-        
+
         adjacentTile = MyGridPos + storedDirection; // Updates the tile the player is trying to move into
 
         if (tilemap.GetColliderType(adjacentTile) == Tile.ColliderType.None)
@@ -164,5 +164,23 @@ public class Player : MonoBehaviour
         }
         if (Input.GetKey(KeyCode.LeftShift) && dashClock <= 0)
             wantToDash = true;
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Bank"))
+        {
+            Bank bank = collision.GetComponent<Bank>();
+
+            if (bank != null && coinCount > 0)
+            {
+                int deposited = bank.DepositCoins(coinCount);
+
+                GlobalVar.score += (deposited * 10);
+                print("Current Score: " + GlobalVar.score);
+
+                coinCount -= deposited;
+            }
+        }
     }
 }
