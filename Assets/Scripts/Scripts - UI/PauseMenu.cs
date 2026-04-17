@@ -145,6 +145,8 @@ public class PauseMenu : MonoBehaviour
     {
 
         isInitializing = true;
+        Debug.Log("Width: " + Screen.width);
+        Debug.Log("Height: " + Screen.height);
 
         //Debug: Assign pause and options menu UI if null
         if (pauseMenuUI == null)
