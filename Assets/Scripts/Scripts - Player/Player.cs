@@ -12,6 +12,7 @@ public class Player : MonoBehaviour
     public Tilemap tilemap; // Swap for a global varaible later.
 
     public int coinCount = 0;
+    public int coinCapacity = 50;
 
     //Speed should be public since it changes dynamically with equip load
     //Light load (default, 0-24%) = 7
@@ -20,7 +21,7 @@ public class Player : MonoBehaviour
     //Heavy load (75-99%) = 4
     //Overburdened (100%) = 2
     public int speed = 7;
-    [SerializeField] private int dashSpeedMultiplier = 2; //Changed this slightly to work with dynamic speed 
+    [SerializeField] private int dashSpeedMultiplier = 4; //Changed this slightly to work with dynamic speed 
     [SerializeField] private int dashDistance = 2;
     [SerializeField] private float dashCooldown = 1f;
     [SerializeField] private float dashClock;
@@ -47,12 +48,12 @@ public class Player : MonoBehaviour
 
     private void OnEnable()
     {
-        EventManager.OnCollectCoin += AddCoin;
+        EventManager.OnCollectCoin += TryAddCoin;
     }
 
     private void OnDisable()
     {
-        EventManager.OnCollectCoin -= AddCoin;
+        EventManager.OnCollectCoin -= TryAddCoin;
     }
 
     private void Update()
@@ -112,7 +113,7 @@ public class Player : MonoBehaviour
 
     private IEnumerator Dash()
     {
-        if (isMoving)
+        if (isMoving || coinCapacity - coinCount == 0)
             yield break;
 
         isMoving = true;
@@ -131,7 +132,7 @@ public class Player : MonoBehaviour
         while ((transform.position - grid.GetCellCenterWorld(dashTarget)).sqrMagnitude > 0.001f)
         {
             sr.color = Color.red;
-            Vector2 newPos = Vector2.MoveTowards(transform.position, grid.GetCellCenterWorld(dashTarget), (speed * dashSpeedMultiplier) * Time.fixedDeltaTime);
+            Vector2 newPos = Vector2.MoveTowards(transform.position, grid.GetCellCenterWorld(dashTarget), dashSpeedMultiplier * Time.fixedDeltaTime);
             rb.MovePosition(newPos);
             yield return new WaitForFixedUpdate();
         }
@@ -147,7 +148,36 @@ public class Player : MonoBehaviour
         dashClock -= Time.deltaTime;
     }
 
-    private void AddCoin() => coinCount++;
+    private bool TryAddCoin()
+    {
+        if (coinCount >= coinCapacity)
+            return false;
+        else
+        {
+            coinCount++;
+            CalculateWeight();
+            return true;
+        }
+    }
+
+    //Light load (default, 0-24%) = 7
+    //Med light load (25-49%) = 6
+    //Med heavy load (50-74%) = 5
+    //Heavy load (75-99%) = 4
+    //Overburdened (100%) = 2
+    private void CalculateWeight()
+    {
+        float heldPercent = (float)coinCount / coinCapacity;
+        print(heldPercent);
+        speed = heldPercent switch
+        {
+            < 0.24f => 7,
+            < 0.49f => 6,
+            < 0.74f => 5,
+            < 0.99f => 4,
+            _ => 2
+        };
+    }
 
     private void InputReader()
     {
@@ -180,6 +210,7 @@ public class Player : MonoBehaviour
                 print("Current Score: " + GlobalVar.score);
 
                 coinCount -= deposited;
+                CalculateWeight();
             }
         }
     }

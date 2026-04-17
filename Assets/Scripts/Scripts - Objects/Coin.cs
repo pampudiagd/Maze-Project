@@ -20,8 +20,9 @@ public class Coin : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        EventManager.OnCollectCoin?.Invoke();
-        Destroy(gameObject);
+        bool collected = EventManager.OnCollectCoin?.Invoke() ?? false;
+        if (collected)
+            Destroy(gameObject);
     }
 
 }

@@ -5,5 +5,5 @@ using System;
 
 public static class EventManager
 {
-    public static Action OnCollectCoin;
+    public static Func<bool> OnCollectCoin;
 }
