@@ -14,6 +14,11 @@ public class Player : MonoBehaviour
     public int coinCount = 0;
     public int coinCapacity = 50;
 
+    public int ammoCount = 0;
+    public int ammoCapacity = 10;
+    [SerializeField] private float gunCooldown = 1f;
+    [SerializeField] private float gunClock;
+
     //Speed should be public since it changes dynamically with equip load
     //Light load (default, 0-24%) = 7
     //Med light load (25-49%) = 6
@@ -37,6 +42,8 @@ public class Player : MonoBehaviour
     private Rigidbody2D rb;
     private SpriteRenderer sr;
 
+    public GameObject myBullet;
+
     private Vector3Int MyGridPos => grid.WorldToCell(transform.position);
 
     // Start is called before the first frame update
@@ -49,17 +56,21 @@ public class Player : MonoBehaviour
     private void OnEnable()
     {
         EventManager.OnCollectCoin += TryAddCoin;
+        EventManager.OnCollectPowerup += GivePowerup;
     }
 
     private void OnDisable()
     {
         EventManager.OnCollectCoin -= TryAddCoin;
+        EventManager.OnCollectPowerup -= GivePowerup;
     }
 
     private void Update()
     {
         if (dashClock > 0)
-            DashTimer();
+            dashClock = Timer(dashClock);
+        if (gunClock > 0)
+            gunClock = Timer(gunClock);
     }
 
     // Update is called once per frame
@@ -143,9 +154,20 @@ public class Player : MonoBehaviour
         isMoving = false;
     }
 
-    private void DashTimer()
+    private void FireBullet()
     {
-        dashClock -= Time.deltaTime;
+        print("Test Fire");
+
+        Instantiate(myBullet, transform.position + transform.up, transform.rotation);
+
+        ammoCount--;
+        gunClock = gunCooldown;
+    }
+
+
+    private float Timer(float clock)
+    {
+        return clock -= Time.deltaTime;
     }
 
     private bool TryAddCoin()
@@ -158,6 +180,12 @@ public class Player : MonoBehaviour
             CalculateWeight();
             return true;
         }
+    }
+
+    private void GivePowerup()
+    {
+        print("Placeholder ammo add");
+        ammoCount = ammoCapacity;
     }
 
     //Light load (default, 0-24%) = 7
@@ -194,6 +222,8 @@ public class Player : MonoBehaviour
         }
         if (Input.GetKey(KeyCode.LeftShift) && dashClock <= 0)
             wantToDash = true;
+        else if (Input.GetKey(KeyCode.Space) && ammoCount > 0 && gunClock <= 0)
+            FireBullet();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
