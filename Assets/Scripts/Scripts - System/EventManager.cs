@@ -6,5 +6,6 @@ using System;
 public static class EventManager
 {
     public static Func<bool> OnCollectCoin;
+    public static Action<GameObject> OnZoneEnter;
     public static Action OnCollectPowerup;
 }

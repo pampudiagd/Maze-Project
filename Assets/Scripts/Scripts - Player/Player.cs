@@ -8,8 +8,8 @@ using System;
 
 public class Player : MonoBehaviour
 {
-    public Grid grid; // Swap for a global variable later.
-    public Tilemap tilemap; // Swap for a global varaible later.
+    public Grid grid; // The current coordinate system
+    public Tilemap tilemap; // The current tiles that are interactable
 
     public int coinCount = 0;
     public int coinCapacity = 50;
@@ -38,7 +38,7 @@ public class Player : MonoBehaviour
 
     [SerializeField] private bool isMoving = false;
     [SerializeField] private bool wantToDash = false;
-
+    private bool updatedMap = false;
     private Rigidbody2D rb;
     private SpriteRenderer sr;
 
@@ -116,6 +116,11 @@ public class Player : MonoBehaviour
                 Vector2 newPos = Vector2.MoveTowards(transform.position, grid.GetCellCenterWorld(adjacentTile), speed * Time.fixedDeltaTime);
                 rb.MovePosition(newPos);
                 yield return new WaitForFixedUpdate();
+                if (updatedMap)
+                {
+                    updatedMap = false;
+                    break;
+                }
             }
         }
 
@@ -156,8 +161,6 @@ public class Player : MonoBehaviour
 
     private void FireBullet()
     {
-        print("Test Fire");
-
         Instantiate(myBullet, transform.position + transform.up, transform.rotation);
 
         ammoCount--;
@@ -184,7 +187,6 @@ public class Player : MonoBehaviour
 
     private void GivePowerup()
     {
-        print("Placeholder ammo add");
         ammoCount = ammoCapacity;
     }
 
@@ -244,4 +246,12 @@ public class Player : MonoBehaviour
             }
         }
     }
+
+    public void UpdateMapInfo(Transform newGrid)
+    {
+        grid = newGrid.GetComponent<Grid>();
+        tilemap = newGrid.GetComponentInChildren<Tilemap>();
+        updatedMap = true;
+    }
+
 }
