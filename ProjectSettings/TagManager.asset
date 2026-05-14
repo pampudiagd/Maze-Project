@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Wall
   - CollisionGrid
+  - EnemyList
+  - Spawner
   layers:
   - Default
   - TransparentFX
@@ -13,10 +15,15 @@ TagManager:
   - 
   - Water
   - UI
-  - Pickup
+  - 
   - Player
   - Bank
   - Bullet
+  - Enemy
+  - 
+  - 
+  - 
+  - Pickup
   - 
   - 
   - 
@@ -33,13 +40,11 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Pursuit
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Actors
+    uniqueID: 720330463
     locked: 0

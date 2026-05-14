@@ -5,4 +5,5 @@ using UnityEngine;
 public static class GlobalVar
 {
     public static int score = 0;
+    public static bool playMode = false;
 }

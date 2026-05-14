@@ -1,38 +1,54 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class MapManager : MonoBehaviour
 {
+    public GameObject startingSector;
     public static GameObject currentSector;
+    public static Grid currentGrid;
+    public static Tilemap currentTilemap;
     public GameObject player;
     public GameObject myCamera;
-    private Player playerScript;
+    private static Player playerScript;
+
+    private int pursuingCount;
+    private int pursuingFinished;
+
+    private bool startMode = true;
 
     public int speed = 2;
+    public static Vector3Int PlayerGridPos => currentGrid.WorldToCell(playerScript.transform.position);
 
     private void OnEnable()
     {
         EventManager.OnZoneEnter += MoveSector;
+        EventManager.PursueLogicStart += CountPursuing;
+        EventManager.PursueLogicEnd += CheckPursuingDone;
     }
 
     private void OnDisable()
     {
         EventManager.OnZoneEnter -= MoveSector;
+        EventManager.PursueLogicStart -= CountPursuing;
+        EventManager.PursueLogicEnd -= CheckPursuingDone;
     }
 
-    // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
         playerScript = player.GetComponent<Player>();
+        MoveSector(startingSector);
     }
 
     private void MoveSector(GameObject Sector)
     {
         currentSector = Sector;
+        print(currentSector.name);
         Transform gridChild = null;
 
-        foreach (Transform child in Sector.transform)
+        foreach (Transform child in Sector.transform) // Finds the collision grid in the new Sector
         {
             if (child.CompareTag("CollisionGrid"))
             {
@@ -40,7 +56,23 @@ public class MapManager : MonoBehaviour
                 break;
             }
         }
+        currentGrid = gridChild.GetComponent<Grid>();
+        currentTilemap = gridChild.GetComponentInChildren<Tilemap>();
         playerScript.UpdateMapInfo(gridChild);
+        EnemyManager.SetNewList();
+        EnemyManager.FillSpawnersList();
+
+        if (EventManager.OnPursuingNewSector != null)
+            EventManager.OnPursuingNewSector.Invoke(Sector);
+        else
+            StartCoroutine(EnemyManager.TriggerSpawners());
+
+        if (startMode)
+        {
+            startMode = false;
+            return;
+        }
+
         StartCoroutine(CamMove());
     }
 
@@ -77,4 +109,14 @@ public class MapManager : MonoBehaviour
     //        yield return new WaitForFixedUpdate();
     //    }
     //}
+
+    private void CountPursuing() => pursuingCount++;
+
+    private void CheckPursuingDone()
+    {
+        pursuingFinished++;
+        if (pursuingFinished == pursuingCount)
+            StartCoroutine(EnemyManager.TriggerSpawners());
+    }
+
 }
