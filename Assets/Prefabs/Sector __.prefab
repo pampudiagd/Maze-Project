@@ -2092,6 +2092,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7035539770620556116}
+  - component: {fileID: 6910132288115341596}
   m_Layer: 0
   m_Name: Sector __
   m_TagString: Untagged
@@ -2118,6 +2119,21 @@ Transform:
   - {fileID: 5080179851239437412}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6910132288115341596
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7055555725954503421}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b662d1cef362eca43b29fa122c20dbee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  coinsTotal: 0
+  coinsRemaining: 0
+  bankFilled: 0
 --- !u!1 &8175756101019594285
 GameObject:
   m_ObjectHideFlags: 0

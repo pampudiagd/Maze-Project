@@ -143,5 +143,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe1ebe29fbf0ec5498d22263d2d98f0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mySector: {fileID: 0}
   maxCapacity: 20
   currentCoins: 0

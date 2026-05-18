@@ -6,22 +6,13 @@ public class BadDude : MonoBehaviour
 {
     public int prefabIndex = 0;
 
-    //[SerializeField] private GameObject homeSector; // The sector this enemy spawns from. Should NEVER change in-game
     public Spawner mySpawner;
-    //public GameObject mySector; // The sector this enemy is currently within. Should change 
     public Vector2 myDirection;
     public int speed = 5;
 
     public bool isPursuing = false;
 
     public Vector3Int MyGridPos => MapManager.currentGrid.WorldToCell(transform.position);
-    //public GameObject HomeSector => homeSector;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        //mySector = HomeSector;
-    }
 
     private void OnEnable()
     {

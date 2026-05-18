@@ -5,24 +5,17 @@ using System;
 
 public class Coin : MonoBehaviour
 {
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public Sector mySector;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         bool collected = EventManager.OnCollectCoin?.Invoke() ?? false;
         if (collected)
+        {
+            mySector.coinsRemaining--;
+            mySector.CalcCompState();
             Destroy(gameObject);
+        }
     }
 
 }

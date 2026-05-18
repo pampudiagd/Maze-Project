@@ -8,6 +8,7 @@ TagManager:
   - CollisionGrid
   - EnemyList
   - Spawner
+  - Coin
   layers:
   - Default
   - TransparentFX

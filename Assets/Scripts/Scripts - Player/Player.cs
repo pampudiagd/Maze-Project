@@ -44,6 +44,8 @@ public class Player : MonoBehaviour
 
     public GameObject myBullet;
 
+    public bool isDead = false;
+
     public Vector3Int MyGridPos => grid.WorldToCell(transform.position);
 
     // Start is called before the first frame update
@@ -76,6 +78,9 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        if (isDead)
+            return;
+
         InputReader();
         if (wantToDash && dashClock <= 0 && speed >= 4) //speed>=4 makes sure dashing is impossible when overburdened
                                                         //this should be changed to directly check the equip load variable once that exists
@@ -121,6 +126,8 @@ public class Player : MonoBehaviour
                     updatedMap = false;
                     break;
                 }
+                if (isDead)
+                    break;
             }
         }
 
@@ -167,7 +174,6 @@ public class Player : MonoBehaviour
         gunClock = gunCooldown;
     }
 
-
     private float Timer(float clock)
     {
         return clock -= Time.deltaTime;
@@ -195,7 +201,7 @@ public class Player : MonoBehaviour
     //Med heavy load (50-74%) = 5
     //Heavy load (75-99%) = 4
     //Overburdened (100%) = 2
-    private void CalculateWeight()
+    public void CalculateWeight()
     {
         float heldPercent = (float)coinCount / coinCapacity;
         print(heldPercent);
@@ -228,23 +234,9 @@ public class Player : MonoBehaviour
             FireBullet();
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    public void Death()
     {
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Bank"))
-        {
-            Bank bank = collision.GetComponent<Bank>();
-
-            if (bank != null && coinCount > 0)
-            {
-                int deposited = bank.DepositCoins(coinCount);
-
-                GlobalVar.score += (deposited * 10);
-                print("Current Score: " + GlobalVar.score);
-
-                coinCount -= deposited;
-                CalculateWeight();
-            }
-        }
+        // Death animation, UI change
     }
 
     public void UpdateMapInfo(Transform newGrid)

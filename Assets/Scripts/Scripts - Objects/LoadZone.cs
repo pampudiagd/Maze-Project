@@ -11,5 +11,4 @@ public class LoadZone : MonoBehaviour
         if (collision.gameObject.layer == LayerMask.NameToLayer("Player") && transform.parent.gameObject != MapManager.currentSector)
             EventManager.OnZoneEnter.Invoke(mySector);
     }
-
 }

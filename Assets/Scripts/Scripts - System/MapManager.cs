@@ -19,7 +19,11 @@ public class MapManager : MonoBehaviour
 
     private bool startMode = true;
 
-    public int speed = 2;
+
+    [SerializeField] private int sectorCount;
+    [SerializeField] private int sectorsComplete = 0;
+
+    public int camMoveSpeed = 2;
     public static Vector3Int PlayerGridPos => currentGrid.WorldToCell(playerScript.transform.position);
 
     private void OnEnable()
@@ -27,6 +31,7 @@ public class MapManager : MonoBehaviour
         EventManager.OnZoneEnter += MoveSector;
         EventManager.PursueLogicStart += CountPursuing;
         EventManager.PursueLogicEnd += CheckPursuingDone;
+        EventManager.SectorCompleted += CheckWinConditions;
     }
 
     private void OnDisable()
@@ -34,12 +39,31 @@ public class MapManager : MonoBehaviour
         EventManager.OnZoneEnter -= MoveSector;
         EventManager.PursueLogicStart -= CountPursuing;
         EventManager.PursueLogicEnd -= CheckPursuingDone;
+        EventManager.SectorCompleted -= CheckWinConditions;
     }
 
     private void Awake()
     {
         playerScript = player.GetComponent<Player>();
         MoveSector(startingSector);
+    }
+
+    private void Start()
+    {
+        CountSectors();
+    }
+
+    private void CountSectors()
+    {
+        foreach (Sector item in GetComponentsInChildren<Sector>(true))
+            sectorCount++;
+    }
+
+    private void CheckWinConditions()
+    {
+        sectorsComplete++;
+        if (sectorsComplete >= sectorCount)
+            print("-----------WIN------------");
     }
 
     private void MoveSector(GameObject Sector)
@@ -87,7 +111,7 @@ public class MapManager : MonoBehaviour
 
         while ((myCamera.transform.position - targetPos).sqrMagnitude > 0.001f)
         {
-            myCamera.transform.position = Vector3.MoveTowards(myCamera.transform.position, targetPos, speed * Time.unscaledDeltaTime);
+            myCamera.transform.position = Vector3.MoveTowards(myCamera.transform.position, targetPos, camMoveSpeed * Time.unscaledDeltaTime);
             yield return null;
         }
         Time.timeScale = 1f;
