@@ -4,6 +4,7 @@ using Unity.VisualScripting;
 using UnityEditor.Build;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.UI;
 using System;
 
 public class Player : MonoBehaviour
@@ -12,7 +13,7 @@ public class Player : MonoBehaviour
     public Tilemap tilemap; // The current tiles that are interactable
 
     public int coinCount = 0;
-    public int coinCapacity = 50;
+    public int coinCapacity = 100;
 
     public int ammoCount = 0;
     public int ammoCapacity = 10;
@@ -26,10 +27,13 @@ public class Player : MonoBehaviour
     //Heavy load (75-99%) = 4
     //Overburdened (100%) = 2
     public int speed = 7;
-    [SerializeField] private int dashSpeedMultiplier = 4; //Changed this slightly to work with dynamic speed 
+    [SerializeField] private int dashSpeedMultiplier = 4;
     [SerializeField] private int dashDistance = 2;
     [SerializeField] private float dashCooldown = 1f;
     [SerializeField] private float dashClock;
+
+    public Slider equipMeterSlider;
+    public Image equipMeterFill;
 
     [SerializeField] private Vector3Int direction = new(1, 0);
     [SerializeField] private Vector3Int storedDirection = new(1, 0);
@@ -199,6 +203,8 @@ public class Player : MonoBehaviour
     {
         float heldPercent = (float)coinCount / coinCapacity;
         print(heldPercent);
+        equipMeterSlider.value = heldPercent;
+
         speed = heldPercent switch
         {
             < 0.24f => 7,
@@ -206,6 +212,15 @@ public class Player : MonoBehaviour
             < 0.74f => 5,
             < 0.99f => 4,
             _ => 2
+        };
+
+        equipMeterFill.color = heldPercent switch
+        {
+            < 0.24f => Color.green,
+            < 0.49f => Color.yellow,
+            < 0.74f => new Color32(255,128,0,255), //orange
+            < 0.99f => Color.red,
+            _ => Color.red //just red for now, may change later
         };
     }
 
