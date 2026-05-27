@@ -1,19 +1,10 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public abstract class Pathfinding : MonoBehaviour
+public class PathfindingChase: Pathfinding
 {
-    protected static readonly Vector3Int[] directions =
-{
-        Vector3Int.up,
-        Vector3Int.down,
-        Vector3Int.left,
-        Vector3Int.right
-    };
-
-    public virtual List<Vector3Int> FindPath(Vector3Int start, Vector3Int goal, Vector3Int prior)
+    public override List<Vector3Int> FindPath(Vector3Int start, Vector3Int goal, Vector3Int prior)
     {
         Queue<Vector3Int> queue = new();
         Dictionary<Vector3Int, Vector3Int> cameFrom = new();
@@ -31,13 +22,14 @@ public abstract class Pathfinding : MonoBehaviour
             foreach (var dir in directions) // Checks a cardinal direction from directions
             {
                 Vector3Int neighbor = current + dir;
+
                 if (cameFrom.ContainsKey(neighbor)) // Skips if neighbor tile is already in cameFrom
                     continue;
 
                 if (!IsWalkable(neighbor)) // Skips if neighbor tile has a collider
                     continue;
 
-                if (neighbor == prior)
+                if (neighbor == prior) 
                     continue;
 
                 queue.Enqueue(neighbor);
@@ -46,26 +38,5 @@ public abstract class Pathfinding : MonoBehaviour
         }
 
         return null;
-    }
-
-    protected virtual List<Vector3Int> ReconstructPath(Dictionary<Vector3Int, Vector3Int> cameFrom, Vector3Int start, Vector3Int goal)
-    {
-        List<Vector3Int> path = new();
-        Vector3Int current = goal;
-
-        while (current != start) // Goes through cameFrom, adding the tiles that connect goal to start into the List, path.
-        {
-            path.Add(current);
-            current = cameFrom[current];
-        }
-
-        //path.Add(start);
-        path.Reverse();
-        return path;
-    }
-
-    protected virtual bool IsWalkable(Vector3Int pos)
-    {
-        return MapManager.currentTilemap.GetColliderType(pos) == Tile.ColliderType.None;
     }
 }

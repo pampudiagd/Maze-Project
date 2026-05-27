@@ -31,8 +31,8 @@ public class Player : MonoBehaviour
     [SerializeField] private float dashCooldown = 1f;
     [SerializeField] private float dashClock;
 
-    [SerializeField] private Vector3Int direction = new(1, 0);
-    [SerializeField] private Vector3Int storedDirection = new(1, 0);
+    public static Vector3Int direction = new(0, 1);
+    [SerializeField] private Vector3Int storedDirection = new(0, 1);
     [SerializeField] private Vector3Int adjacentTile;
     private Vector3Int dashTarget;
 

@@ -6,21 +6,13 @@ public class Spawner : MonoBehaviour
 {
     public GameObject enemyPrefab;
     public BadDude myEnemy;
-    public List<GameObject> prefabList = new();
+    [SerializeField] private EnemyManager.EnemyType myType = EnemyManager.EnemyType.None; // Doesn't change during runtime
 
-    private enum EnemyType // Change to associate each with a relevant enemy prefab, so that each enemy doesn't need to hold their whole prefab
-    {
-        Chaser,
-        Test2,
-        Test3,
-        Test4,
-        None
-    }
+    [SerializeField] private EnemyPrefabDatabase database;
 
-    public void SetEnemyType(int num)
+    private void Awake()
     {
-        print("List length: " + prefabList.Count);
-        enemyPrefab = prefabList[num];
+        enemyPrefab = database.prefabs[(int)myType];
     }
 
     public void EmptySpawner()
@@ -28,6 +20,21 @@ public class Spawner : MonoBehaviour
         print($"Emptying {this.name}");
         enemyPrefab = null;
         myEnemy = null;
+        EventManager.OnBankFilled -= ResetOriginal;
+    }
+
+    public void FillSpawner(EnemyManager.EnemyType prefabIndex, BadDude enemy = null)
+    {
+        myEnemy = enemy;
+        enemyPrefab = database.prefabs[(int)prefabIndex];
+        if (enemy != null)
+            EventManager.OnBankFilled += ResetOriginal;
+    }
+
+    private void ResetOriginal()
+    {
+        FillSpawner(myType);
+        EventManager.OnBankFilled -= ResetOriginal;
     }
 
     public void SpawnEnemy()

@@ -8,6 +8,7 @@ public class Sector : MonoBehaviour
     public int coinsRemaining;
 
     public bool bankFilled = false;
+    public bool completionMark = false; // Prevents the Sector progressing the win condition again every time its completion is calculated
 
     public enum SectorCompletionState
     {
@@ -51,13 +52,17 @@ public class Sector : MonoBehaviour
                 break;
             case (true, false):
                 state = SectorCompletionState.AllCoins;
+                if (!completionMark)
+                {
+                    completionMark = true;
+                    EventManager.SectorCompleted.Invoke();
+                }
                 break;
             case (false, true):
                 state = SectorCompletionState.BankFilled;
                 break;
             case (true, true):
                 state = SectorCompletionState.Completed;
-                EventManager.SectorCompleted.Invoke();
                 break;
         }
     }

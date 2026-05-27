@@ -6,6 +6,8 @@ using UnityEngine.Tilemaps;
 
 public class MapManager : MonoBehaviour
 {
+    public static int sectorGeneration = 0;
+
     public GameObject startingSector;
     public static GameObject currentSector;
     public static Grid currentGrid;
@@ -68,6 +70,7 @@ public class MapManager : MonoBehaviour
 
     private void MoveSector(GameObject Sector)
     {
+        sectorGeneration++;
         currentSector = Sector;
         print(currentSector.name);
         Transform gridChild = null;
@@ -89,7 +92,7 @@ public class MapManager : MonoBehaviour
         if (EventManager.OnPursuingNewSector != null)
             EventManager.OnPursuingNewSector.Invoke(Sector);
         else
-            StartCoroutine(EnemyManager.TriggerSpawners());
+            StartCoroutine(EnemyManager.TriggerSpawners(startTimer: 1.5f));
 
         if (startMode)
         {

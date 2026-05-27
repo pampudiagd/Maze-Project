@@ -2,24 +2,26 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BadDude : MonoBehaviour
+public abstract class BadDude : MonoBehaviour
 {
-    public int prefabIndex = 0;
+    public EnemyManager.EnemyType myType = EnemyManager.EnemyType.None;
+
+    public Pathfinding myPathfindingType;
 
     public Spawner mySpawner;
-    public Vector2 myDirection;
     public int speed = 5;
 
     public bool isPursuing = false;
 
     public Vector3Int MyGridPos => MapManager.currentGrid.WorldToCell(transform.position);
+    public Vector3Int myPriorPos;
 
-    private void OnEnable()
+    protected virtual void OnEnable()
     {
         Activate();
     }
 
-    private void OnDisable()
+    protected virtual void OnDisable()
     {
         if (!isPursuing)
         {
@@ -28,49 +30,19 @@ public class BadDude : MonoBehaviour
         }
     }
 
-    public void Initialize(Spawner newSpawner)
+    public virtual void Initialize(Spawner newSpawner)
     {
         mySpawner = newSpawner;
     }
 
-    private void Activate()
+    protected virtual void Activate()
     {
         StartCoroutine(Move());
     }
 
-    // Moves one tile at a time
-    private IEnumerator Move()
-    {
-        yield return null;
-        Vector3Int lastPlayerPos = MapManager.PlayerGridPos;
-        List<Vector3Int> path = Pathfinding.FindPath(MyGridPos, MapManager.PlayerGridPos);
-        int pathIndex = 0;
+    protected abstract IEnumerator Move();
 
-        while (true)
-        {
-            if (path == null || pathIndex >= path.Count || lastPlayerPos != MapManager.PlayerGridPos)
-            {
-                lastPlayerPos = MapManager.PlayerGridPos;
-                path = Pathfinding.FindPath(MyGridPos, lastPlayerPos);
-                pathIndex = 0;
-            }
-
-            Vector3Int targetTile = path[pathIndex];
-            transform.up = RotateToVector3(targetTile);
-
-            Vector3 targetWorld = MapManager.currentGrid.GetCellCenterWorld(targetTile);
-
-            while ((transform.position - targetWorld).sqrMagnitude > 0.001f)
-            {
-                transform.position = Vector3.MoveTowards(transform.position, targetWorld, speed * Time.deltaTime);
-                yield return null;
-            }
-
-            pathIndex++;
-        }
-    }
-
-    private Vector3 RotateToVector3(Vector3Int targetTile)
+    protected Vector3 RotateToVector3(Vector3Int targetTile)
     {
         Vector3Int difference = targetTile - MyGridPos;
         if (difference.x > 0)
@@ -85,11 +57,11 @@ public class BadDude : MonoBehaviour
             return new Vector3(1, 1, 0); // This should NEVER get here.
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Bullet"))
-            Destroy(gameObject);
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Pursuit"))
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Bullet") || collision.CompareTag("BankNuke"))
+            Death();
+        else if (collision.gameObject.layer == LayerMask.NameToLayer("Pursuit"))
         {
             print("ENTERED PURSUIT RANGE");
             isPursuing = true;
@@ -97,7 +69,13 @@ public class BadDude : MonoBehaviour
         }
     }
 
-    private void OnTriggerExit2D(Collider2D collision)
+    private void Death()
+    {
+        EnemyManager.Instance.StartCoroutine(EnemyManager.TriggerSingleSpawner(mySpawner, startTimer: 4.0f)); // Calls for mySpawner to spawn
+        Destroy(gameObject);
+    }    
+
+    protected virtual void OnTriggerExit2D(Collider2D collision)
     {
         if (collision.gameObject.layer == LayerMask.NameToLayer("Pursuit"))
         {
@@ -108,13 +86,12 @@ public class BadDude : MonoBehaviour
     }
 
     // Sets parent to the EnemyList of the newSector and assigns to an empty spawner. If none are empty, this object destroys itself
-    private void PursueSector(GameObject newSector)
+    protected virtual void PursueSector(GameObject newSector)
     {
         EventManager.PursueLogicStart.Invoke();
         Transform newParentList = EnemyManager.currentEnemyList.transform;
-        //mySector = newSector;
 
-        mySpawner = EnemyManager.AssignSpawner(this, prefabIndex);
+        mySpawner = EnemyManager.AssignSpawner(this, myType);
 
         if (mySpawner != null)
         {

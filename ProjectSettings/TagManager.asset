@@ -9,6 +9,7 @@ TagManager:
   - EnemyList
   - Spawner
   - Coin
+  - BankNuke
   layers:
   - Default
   - TransparentFX

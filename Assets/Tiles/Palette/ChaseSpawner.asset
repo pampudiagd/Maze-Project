@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: afc16b9b471b1994893f2b8a626209c3, type: 3}
-  m_Name: EnemySpawner
+  m_Name: ChaseSpawner
   m_EditorClassIdentifier: 
   m_Sprite: {fileID: 2747690628134850419, guid: 16037dbd798344f57a526d53d48f5ead, type: 3}
   m_Color: {r: 0.8962264, g: 0.2512606, b: 0.08877714, a: 1}
