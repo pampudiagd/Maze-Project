@@ -1,41 +1,21 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class PathfindingFlank : Pathfinding
+public class PathfindingFickle : Pathfinding
 {
-    [SerializeField][Tooltip("Number of spaces in front of the player the target tile should be.")] private int goalMod = 1;
+    [SerializeField] private int randomTileReach = 4;
 
     public override List<Vector3Int> FindPath(Vector3Int start, Vector3Int goal, Vector3Int prior)
     {
-        // Find desired target position in front of player
-        Vector3Int desiredGoal = goal + (Player.direction * goalMod);
-
-        // If desired target is invalid, walk backward toward player
-        // until a valid floor tile is found.
-        while (!IsValidTarget(desiredGoal, goal))
+        Vector3Int desiredGoal = RandomTile(goal);
+        int i = 0;
+        while (!IsValidTarget(desiredGoal, goal, start) && i < (randomTileReach^2))
         {
-            desiredGoal -= Player.direction;
-
-            // Prevent targeting player's own tile
-            if (desiredGoal == goal)
-                break;
-        }
-
-        // If still invalid, search nearby tiles around player
-        if (!IsValidTarget(desiredGoal, goal))
-        {
-            foreach (Vector3Int dir in directions)
-            {
-                Vector3Int fallback = goal + dir;
-
-                if (IsValidTarget(fallback, goal))
-                {
-                    desiredGoal = fallback;
-                    break;
-                }
-            }
+            desiredGoal = RandomTile(goal);
+            i++;
         }
 
         Queue<Vector3Int> queue = new();
@@ -65,13 +45,24 @@ public class PathfindingFlank : Pathfinding
                     continue;
 
                 // Never move onto player's tile
-                if (neighbor == goal)
-                    continue;
+                //if (neighbor == goal)
+                //    continue;
 
                 queue.Enqueue(neighbor);
                 cameFrom[neighbor] = current;
             }
         }
+
         return base.FindPath(start, goal, prior);
+    }
+
+    private Vector3Int RandomTile(Vector3Int playerPos)
+    {
+        Vector3Int target = new();
+
+        target.x = UnityEngine.Random.Range(playerPos.x - randomTileReach, playerPos.x + randomTileReach);
+        target.y = UnityEngine.Random.Range(playerPos.y - randomTileReach, playerPos.y + randomTileReach);
+
+        return target;
     }
 }

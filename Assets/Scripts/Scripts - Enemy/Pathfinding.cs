@@ -63,9 +63,39 @@ public abstract class Pathfinding : MonoBehaviour
         path.Reverse();
         return path;
     }
-
+    
+    // Returns true if the given Vector3Int doesn't have a solid collider
     protected virtual bool IsWalkable(Vector3Int pos)
     {
         return MapManager.currentTilemap.GetColliderType(pos) == Tile.ColliderType.None;
+    }
+
+    // Returns true if the given Vector3Int doesn't have a solid collider AND isn't a blank space
+    protected virtual bool IsWalkableStrict(Vector3Int pos)
+    {
+        // Tile must exist
+        if (!MapManager.currentTilemap.HasTile(pos))
+            return false;
+
+        // Tile must not be blocked
+        return MapManager.currentTilemap.GetColliderType(pos) == Tile.ColliderType.None;
+    }
+
+    // Checks if the given position, pos, equals the player's position and if it's a floor tile
+    protected bool IsValidTarget(Vector3Int pos, Vector3Int playerPos)
+    {
+        if (pos == playerPos)
+            return false;
+
+        return IsWalkableStrict(pos);
+    }
+
+    // Checks if the given position, pos, equals the player's position and if it's a floor tile
+    protected bool IsValidTarget(Vector3Int pos, Vector3Int playerPos, Vector3Int start)
+    {
+        if (pos == playerPos || pos == start)
+            return false;
+
+        return IsWalkableStrict(pos);
     }
 }

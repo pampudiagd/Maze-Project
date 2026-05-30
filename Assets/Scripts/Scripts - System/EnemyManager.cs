@@ -18,7 +18,7 @@ public class EnemyManager: MonoBehaviour
     {
         Chaser,
         Flanker,
-        Test3,
+        Fickle,
         Test4,
         None
     }
