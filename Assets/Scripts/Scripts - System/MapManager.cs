@@ -21,7 +21,6 @@ public class MapManager : MonoBehaviour
 
     private bool startMode = true;
 
-
     [SerializeField] private int sectorCount;
     [SerializeField] private int sectorsComplete = 0;
 
@@ -145,5 +144,4 @@ public class MapManager : MonoBehaviour
         if (pursuingFinished == pursuingCount)
             StartCoroutine(EnemyManager.TriggerSpawners());
     }
-
 }

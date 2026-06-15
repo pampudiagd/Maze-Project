@@ -13,5 +13,6 @@ public static class EventManager
     public static Action PursueLogicEnd;
     public static Action SectorCompleted;
     public static Action OnBankFilled;
+    public static Action OnPlayerMoved;
 
 }

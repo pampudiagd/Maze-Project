@@ -31,9 +31,12 @@ public class PlayerHitbox : MonoBehaviour
         }
         else if (collision.gameObject.layer == LayerMask.NameToLayer("Enemy"))
         {
-            GetComponent<CircleCollider2D>().gameObject.SetActive(false);
-            player.isDead = true;
-            print("<<<<<<<<<<GAME OVER>>>>>>>>>>>");
+            if (Time.time > player.InvincibleUntil)
+            {
+                GetComponent<CircleCollider2D>().gameObject.SetActive(false);
+                player.isDead = true;
+                print("<<<<<<<<<<GAME OVER>>>>>>>>>>>");
+            }
         }
     }
 }

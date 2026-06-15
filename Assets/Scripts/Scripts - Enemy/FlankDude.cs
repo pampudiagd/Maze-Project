@@ -1,24 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
-public class FickleDude : BadDude
+public class FlankDude : BadDude
 {
-    [SerializeField] private int randomTileReach = 4;
-    private Vector3Int goalTile;
     private Vector3 targetTile;
-
-    public static Dictionary<Vector3Int, int> distanceMap = new();
-
-    protected override void Activate()
-    {
-        PopDistMap();
-        StartCoroutine(Move());
-    }
 
     protected override IEnumerator Move()
     {
+        targetTile = MapManager.currentGrid.GetCellCenterWorld(MyGridPos);
         while (true)
         {
             if (!Pathfinding.IsWalkableStrict(MyGridPos))
@@ -34,9 +24,6 @@ public class FickleDude : BadDude
                 yield return null;
             }
             transform.position = targetTile;
-
-            if (goalTile == MyGridPos)
-                PopDistMap();
         }
     }
 
@@ -60,10 +47,10 @@ public class FickleDude : BadDude
                 continue;
 
             // Skip unreachable tiles.
-            if (!distanceMap.ContainsKey(neighbor))
+            if (!EnemyManager.distanceMapFlank.ContainsKey(neighbor))
                 continue;
 
-            int distance = distanceMap[neighbor];
+            int distance = EnemyManager.distanceMapFlank[neighbor];
 
             if (distance < bestDistance)
             {
@@ -80,35 +67,5 @@ public class FickleDude : BadDude
 
         myDirection = bestDirection;
         transform.up = bestDirection;
-    }
-
-    private void PopDistMap()
-    {
-        goalTile = Pathfinding.RandomTile(MapManager.PlayerGridPos, randomTileReach);
-
-        Queue<Vector3Int> queue = new();
-
-        distanceMap.Clear();
-
-        queue.Enqueue(goalTile);
-        distanceMap[goalTile] = 0;
-
-        while (queue.Count > 0)
-        {
-            Vector3Int current = queue.Dequeue();
-
-            foreach (var dir in Pathfinding.directions)
-            {
-                Vector3Int neighbor = current + dir;
-                if (distanceMap.ContainsKey(neighbor))
-                    continue;
-                if (!Pathfinding.IsWalkableStrict(neighbor))
-                    continue;
-
-                distanceMap[neighbor] = distanceMap[current] + 1;
-
-                queue.Enqueue(neighbor);
-            }
-        }
     }
 }

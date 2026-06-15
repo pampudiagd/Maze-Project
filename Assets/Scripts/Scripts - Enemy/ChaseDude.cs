@@ -4,37 +4,68 @@ using UnityEngine;
 
 public class ChaseDude : BadDude
 {
-    // Moves one tile at a time
+    private Vector3 targetTile;
+
     protected override IEnumerator Move()
     {
-        yield return null;
-        Vector3Int lastPlayerPos = MapManager.PlayerGridPos;
-        List<Vector3Int> path = myPathfindingType.FindPath(MyGridPos, MapManager.PlayerGridPos, myPriorPos);
-        myPriorPos = MyGridPos;
-        int pathIndex = 0;
-
+        targetTile = MapManager.currentGrid.GetCellCenterWorld(MyGridPos);
         while (true)
         {
-            if (path == null || pathIndex >= path.Count || lastPlayerPos != MapManager.PlayerGridPos)
+            if (!Pathfinding.IsWalkableStrict(MyGridPos))
+                yield return MoveIntoBounds();
+
+            ChooseDirection();
+
+            targetTile = MapManager.currentGrid.GetCellCenterWorld(MyGridPos + Vector3Int.FloorToInt(myDirection));
+
+            while (transform.position != targetTile)
             {
-                lastPlayerPos = MapManager.PlayerGridPos;
-                path = myPathfindingType.FindPath(MyGridPos, lastPlayerPos, myPriorPos);
-                myPriorPos = MyGridPos;
-                pathIndex = 0;
-            }
-
-            Vector3Int targetTile = path[pathIndex];
-            transform.up = RotateToVector3(targetTile);
-
-            Vector3 targetWorld = MapManager.currentGrid.GetCellCenterWorld(targetTile);
-
-            while ((transform.position - targetWorld).sqrMagnitude > 0.001f)
-            {
-                transform.position = Vector3.MoveTowards(transform.position, targetWorld, speed * Time.deltaTime);
+                transform.position = Vector3.MoveTowards(transform.position, targetTile, speed * Time.deltaTime);
                 yield return null;
             }
-
-            pathIndex++;
+            transform.position = targetTile;
         }
+    }
+
+    private void ChooseDirection()
+    {
+        Vector3Int reverse = -myDirection;
+
+        Vector3Int bestDirection = Vector3Int.zero;
+        int bestDistance = int.MaxValue;
+
+        foreach (Vector3Int dir in Pathfinding.directions)
+        {
+            // Don't immediately reverse.
+            if (dir == reverse)
+                continue;
+
+            Vector3Int neighbor = MyGridPos + dir;
+
+            // Can't move into walls.
+            if (!Pathfinding.IsWalkableStrict(neighbor))
+                continue;
+
+            // Skip unreachable tiles.
+            if (!EnemyManager.distanceMapChase.ContainsKey(neighbor))
+                continue;
+
+            int distance = EnemyManager.distanceMapChase[neighbor];
+
+            if (distance < bestDistance)
+            {
+                bestDistance = distance;
+                bestDirection = dir;
+            }
+        }
+
+        // Dead-end handling.
+        if (bestDirection == Vector3Int.zero)
+        {
+            bestDirection = reverse;
+        }
+
+        myDirection = bestDirection;
+        transform.up = bestDirection;
     }
 }

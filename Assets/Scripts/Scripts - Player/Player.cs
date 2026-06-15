@@ -30,6 +30,12 @@ public class Player : MonoBehaviour
     [SerializeField] private int dashDistance = 2;
     [SerializeField] private float dashCooldown = 1f;
     [SerializeField] private float dashClock;
+    [SerializeField] private float iDashDuration = 0.5f;
+
+    private float invincibleUntil;
+    public float InvincibleUntil => invincibleUntil;
+    private bool wasInvincible;
+    private bool currentlyInvincible;
 
     public static Vector3Int direction = new(0, 1);
     [SerializeField] private Vector3Int storedDirection = new(0, 1);
@@ -73,6 +79,7 @@ public class Player : MonoBehaviour
             dashClock = Timer(dashClock);
         if (gunClock > 0)
             gunClock = Timer(gunClock);
+        ICheck();
     }
 
     // Update is called once per frame
@@ -129,6 +136,7 @@ public class Player : MonoBehaviour
                 if (isDead)
                     break;
             }
+            EventManager.OnPlayerMoved.Invoke();
         }
 
         isMoving = false;
@@ -140,6 +148,9 @@ public class Player : MonoBehaviour
             yield break;
 
         isMoving = true;
+
+        invincibleUntil = Time.time + iDashDuration;
+        sr.color = Color.red;
 
         adjacentTile = MyGridPos;
 
@@ -154,16 +165,29 @@ public class Player : MonoBehaviour
 
         while ((transform.position - grid.GetCellCenterWorld(dashTarget)).sqrMagnitude > 0.001f)
         {
-            sr.color = Color.red;
             Vector2 newPos = Vector2.MoveTowards(transform.position, grid.GetCellCenterWorld(dashTarget), dashSpeedMultiplier * Time.fixedDeltaTime);
             rb.MovePosition(newPos);
             yield return new WaitForFixedUpdate();
         }
-
-        sr.color = Color.white;
+        
         dashClock = dashCooldown;
         wantToDash = false;
         isMoving = false;
+    }
+
+    private void ICheck()
+    { 
+        currentlyInvincible = Time.time < invincibleUntil;
+
+        if (wasInvincible && !currentlyInvincible)
+            IFramesEnded();
+
+        wasInvincible = currentlyInvincible;
+    }
+
+    private void IFramesEnded()
+    {
+        sr.color = Color.white;
     }
 
     private void FireBullet()

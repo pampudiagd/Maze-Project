@@ -100,7 +100,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myType: 0
-  myPathfindingType: {fileID: 5369488729965933053, guid: 1f29c03d5c72b5a4e9ae5e226a57e9fb, type: 3}
+  myPathfindingType: {fileID: -542220686904083265, guid: 1f29c03d5c72b5a4e9ae5e226a57e9fb, type: 3}
   mySpawner: {fileID: 0}
   speed: 5
   isPursuing: 0

@@ -4,13 +4,16 @@ using Unity.VisualScripting;
 using UnityEngine;
 using static UnityEditor.Progress;
 
-public class EnemyManager: MonoBehaviour
+public class EnemyManager : MonoBehaviour
 {
     public const float spawnerInterval = 1f;
     public const float initialDelay = 1f;
 
     public static GameObject currentEnemyList = null;
     public static List<Spawner> spawners = new();
+
+    public static Dictionary<Vector3Int, int> distanceMapChase = new();
+    public static Dictionary<Vector3Int, int> distanceMapFlank = new();
 
     public static EnemyManager Instance { get; private set; }
 
@@ -21,6 +24,16 @@ public class EnemyManager: MonoBehaviour
         Fickle,
         Test4,
         None
+    }
+
+    private void OnEnable()
+    {
+        EventManager.OnPlayerMoved += UpdateFollowMaps;
+    }
+
+    private void OnDisable()
+    {
+        EventManager.OnPlayerMoved -= UpdateFollowMaps;
     }
 
     private void Awake()
@@ -119,5 +132,40 @@ public class EnemyManager: MonoBehaviour
             }
         }
         return foundSpawner;
+    }
+
+    private void UpdateFollowMaps()
+    {
+        distanceMapChase = PopDistMap(distanceMapChase, MapManager.PlayerGridPos);
+        distanceMapFlank = PopDistMap(distanceMapFlank, Pathfinding.FlankTile(MapManager.PlayerGridPos, 4));
+    }
+
+    private Dictionary<Vector3Int, int> PopDistMap(Dictionary<Vector3Int, int> distMap, Vector3Int targetTile)
+    {
+        Queue<Vector3Int> queue = new();
+
+        distMap.Clear();
+
+        queue.Enqueue(targetTile);
+        distMap[targetTile] = 0;
+
+        while (queue.Count > 0)
+        {
+            Vector3Int current = queue.Dequeue();
+
+            foreach (var dir in Pathfinding.directions)
+            {
+                Vector3Int neighbor = current + dir;
+                if (distMap.ContainsKey(neighbor))
+                    continue;
+                if (!Pathfinding.IsWalkableStrict(neighbor))
+                    continue;
+
+                distMap[neighbor] = distMap[current] + 1;
+
+                queue.Enqueue(neighbor);
+            }
+        }
+        return distMap;
     }
 }

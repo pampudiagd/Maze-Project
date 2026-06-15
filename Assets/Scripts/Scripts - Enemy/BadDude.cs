@@ -6,8 +6,6 @@ public abstract class BadDude : MonoBehaviour
 {
     public EnemyManager.EnemyType myType = EnemyManager.EnemyType.None;
 
-    public Pathfinding myPathfindingType;
-
     public Spawner mySpawner;
     public int speed = 5;
 
@@ -15,6 +13,8 @@ public abstract class BadDude : MonoBehaviour
 
     public Vector3Int MyGridPos => MapManager.currentGrid.WorldToCell(transform.position);
     public Vector3Int myPriorPos;
+
+    public Vector3Int myDirection = Vector3Int.up;
 
     protected virtual void OnEnable()
     {
@@ -41,6 +41,33 @@ public abstract class BadDude : MonoBehaviour
     }
 
     protected abstract IEnumerator Move();
+
+    // Moves one tile at a time
+    protected IEnumerator MoveIntoBounds()
+    {
+        yield return null;
+        List<Vector3Int> path = Pathfinding.FindPath(MyGridPos, MapManager.PlayerGridPos, myPriorPos);
+        int pathIndex = 0;
+
+        while (pathIndex < path.Count - 1)
+        {
+            myPriorPos = MyGridPos;
+            if (path.Count == 0)
+                print("Path is empty");
+            Vector3Int targetTile = path[pathIndex];
+            transform.up = RotateToVector3(targetTile);
+
+            Vector3 targetWorld = MapManager.currentGrid.GetCellCenterWorld(targetTile);
+
+            while ((transform.position - targetWorld).sqrMagnitude > 0.001f)
+            {
+                transform.position = Vector3.MoveTowards(transform.position, targetWorld, speed * Time.deltaTime);
+                yield return null;
+            }
+
+            pathIndex++;
+        }
+    }
 
     protected Vector3 RotateToVector3(Vector3Int targetTile)
     {

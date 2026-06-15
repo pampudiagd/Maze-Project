@@ -94,7 +94,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7599562386578047588}
   - component: {fileID: 2914847266030432360}
-  - component: {fileID: 5433610817550737387}
+  - component: {fileID: 2324767002202034609}
   - component: {fileID: 3991010614509133302}
   m_Layer: 10
   m_Name: Fickle Guy
@@ -171,7 +171,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &5433610817550737387
+--- !u!114 &2324767002202034609
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -180,15 +180,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 4601678847669823866}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5073db90f8222b4e8d75ce39e6263e1, type: 3}
+  m_Script: {fileID: 11500000, guid: 943dbed771e7d6641af5c68b28bba8e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myType: 0
+  myType: 2
   myPathfindingType: {fileID: 781887879667570440, guid: b51fdfdf526f59248968b95e4fe3ece9, type: 3}
   mySpawner: {fileID: 0}
   speed: 5
   isPursuing: 0
   myPriorPos: {x: 0, y: 0, z: 0}
+  myDirection: {x: 0, y: 1, z: 0}
+  randomTileReach: 4
 --- !u!58 &3991010614509133302
 CircleCollider2D:
   m_ObjectHideFlags: 0
