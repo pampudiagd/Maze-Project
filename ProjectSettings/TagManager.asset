@@ -10,6 +10,8 @@ TagManager:
   - Spawner
   - Coin
   - BankNuke
+  - BankAttack
+  - DebugHolder
   layers:
   - Default
   - TransparentFX

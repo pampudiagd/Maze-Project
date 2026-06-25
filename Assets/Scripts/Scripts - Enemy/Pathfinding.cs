@@ -106,15 +106,6 @@ public class Pathfinding : MonoBehaviour
         return IsWalkableStrict(pos);
     }
 
-    // Checks if the given position, pos, equals the player's position and if it's a floor tile
-    public static bool IsValidTarget(Vector3Int pos, Vector3Int playerPos, Vector3Int start)
-    {
-        if (pos == playerPos || pos == start)
-            return false;
-
-        return IsWalkableStrict(pos);
-    }
-
     public static Vector3Int FlankTile(Vector3Int initGoal, int flankMod)
     {
         // Find desired target position in front of player
@@ -148,19 +139,86 @@ public class Pathfinding : MonoBehaviour
         return desiredGoal;
     }
 
-    public static Vector3Int RandomTile(Vector3Int playerPos, int randomTileReach)
+    /// <summary>
+    /// Returns a random open tile within the given reach of a position.
+    /// </summary>
+    /// <returns></returns>
+    public static Vector3Int RandomTile(Vector3Int pos, int randomTileReach)
     {
         Vector3Int target = new();
-        int i = 0;
 
         do
         {
-            target.x = UnityEngine.Random.Range(playerPos.x - randomTileReach, playerPos.x + randomTileReach);
-            target.y = UnityEngine.Random.Range(playerPos.y - randomTileReach, playerPos.y + randomTileReach);
-            i++;
+            target.x = UnityEngine.Random.Range(pos.x - randomTileReach, pos.x + randomTileReach);
+            target.y = UnityEngine.Random.Range(pos.y - randomTileReach, pos.y + randomTileReach);
         }
         while (!IsWalkableStrict(target));// && i < (randomTileReach * randomTileReach));
 
         return target;
+    }
+
+    /// <summary>
+    /// Returns a random open tile in a Sector.
+    /// </summary>
+    /// <returns></returns>
+    public static Vector3Int RandomTile()
+    {
+        Vector3Int target = new();
+        int range = MapManager.sectorHalf;
+
+        do
+        {
+            target.x = UnityEngine.Random.Range(-range, range);
+            target.y = UnityEngine.Random.Range(-range, range);
+        }
+        while (!IsWalkableStrict(target));
+
+        return target;
+    }
+
+    public static List<Vector3Int> GetRandomReachableTiles(Vector3Int start)
+    {
+        Queue<Vector3Int> queue = new();
+        HashSet<Vector3Int> visited = new();
+
+        queue.Enqueue(start);
+        visited.Add(start);
+
+        while (queue.Count > 0)
+        {
+            Vector3Int current = queue.Dequeue();
+
+            foreach (Vector3Int dir in directions)
+            {
+                Vector3Int neighbor = current + dir;
+
+                if (visited.Contains(neighbor))
+                    continue;
+
+                if (!IsWalkableStrict(neighbor))
+                    continue;
+
+                visited.Add(neighbor);
+                queue.Enqueue(neighbor);
+            }
+        }
+
+        List<Vector3Int> reachable = new(visited);
+
+        reachable.Remove(start);
+
+        List<Vector3Int> result = new();
+
+        int count = Mathf.Min(4, reachable.Count);
+
+        for (int i = 0; i < count; i++)
+        {
+            int index = Random.Range(0, reachable.Count);
+
+            result.Add(reachable[index]);
+            reachable.RemoveAt(index);
+        }
+
+        return result;
     }
 }

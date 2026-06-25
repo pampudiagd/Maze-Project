@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 public abstract class BadDude : MonoBehaviour
@@ -11,10 +12,14 @@ public abstract class BadDude : MonoBehaviour
 
     public bool isPursuing = false;
 
+    protected Vector3 targetTile;
+
     public Vector3Int MyGridPos => MapManager.currentGrid.WorldToCell(transform.position);
     public Vector3Int myPriorPos;
 
     public Vector3Int myDirection = Vector3Int.up;
+
+    protected Dictionary<Vector3Int, int> fallbackDistMap = new();
 
     protected virtual void OnEnable()
     {
@@ -40,7 +45,74 @@ public abstract class BadDude : MonoBehaviour
         StartCoroutine(Move());
     }
 
-    protected abstract IEnumerator Move();
+    protected virtual IEnumerator Move()
+    {
+        while (true)
+        {
+            if (!Pathfinding.IsWalkableStrict(MyGridPos))
+            {
+                yield return MoveIntoBounds();
+                yield break;
+            }
+
+            do
+                PopDistMap();
+            while (!fallbackDistMap.ContainsKey(MyGridPos));
+
+            ChooseDirection(fallbackDistMap);
+
+            targetTile = MapManager.currentGrid.GetCellCenterWorld(MyGridPos + Vector3Int.FloorToInt(myDirection));
+
+            while (transform.position != targetTile)
+            {
+                transform.position = Vector3.MoveTowards(transform.position, targetTile, speed * Time.deltaTime);
+                yield return null;
+            }
+            transform.position = targetTile;
+        }
+    }
+
+    protected void ChooseDirection(Dictionary<Vector3Int, int> distanceMap)
+    {
+        Vector3Int reverse = -myDirection;
+
+        Vector3Int bestDirection = Vector3Int.zero;
+        int bestDistance = int.MaxValue;
+
+        foreach (Vector3Int dir in Pathfinding.directions)
+        {
+            // Don't immediately reverse.
+            if (dir == reverse)
+                continue;
+
+            Vector3Int neighbor = MyGridPos + dir;
+
+            // Can't move into walls.
+            if (!Pathfinding.IsWalkableStrict(neighbor))
+                continue;
+
+            // Skip unreachable tiles.
+            if (!distanceMap.ContainsKey(neighbor))
+                continue;
+
+            int distance = distanceMap[neighbor];
+
+            if (distance < bestDistance)
+            {
+                bestDistance = distance;
+                bestDirection = dir;
+            }
+        }
+
+        // Dead-end handling.
+        if (bestDirection == Vector3Int.zero)
+        {
+            bestDirection = reverse;
+        }
+
+        myDirection = bestDirection;
+        transform.up = bestDirection;
+    }
 
     // Moves one tile at a time
     protected IEnumerator MoveIntoBounds()
@@ -66,6 +138,36 @@ public abstract class BadDude : MonoBehaviour
             }
 
             pathIndex++;
+        }
+    }
+
+    void PopDistMap()
+    {
+        Vector3Int goalTile = Pathfinding.RandomTile();
+
+        Queue<Vector3Int> queue = new();
+
+        fallbackDistMap.Clear();
+
+        queue.Enqueue(goalTile);
+        fallbackDistMap[goalTile] = 0;
+
+        while (queue.Count > 0)
+        {
+            Vector3Int current = queue.Dequeue();
+
+            foreach (var dir in Pathfinding.directions)
+            {
+                Vector3Int neighbor = current + dir;
+                if (fallbackDistMap.ContainsKey(neighbor))
+                    continue;
+                if (!Pathfinding.IsWalkableStrict(neighbor))
+                    continue;
+
+                fallbackDistMap[neighbor] = fallbackDistMap[current] + 1;
+
+                queue.Enqueue(neighbor);
+            }
         }
     }
 

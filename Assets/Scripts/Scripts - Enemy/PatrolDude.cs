@@ -1,29 +1,39 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
+using TMPro;
+using UnityEditor.SearchService;
 using UnityEngine;
 
-public class FickleDude : BadDude
+public class PatrolDude : BadDude
 {
-    [SerializeField] private int randomTileReach = 4;
     private Vector3Int goalTile;
+
+    private List<Vector3Int> targetList = new();
+    private int currentIndex = 0;
 
     public static Dictionary<Vector3Int, int> distanceMap = new();
 
+    //private TextMeshPro debugMarker;
+    //public GameObject debugPrefab;
+    //[SerializeField] private GameObject holder;
+
     protected override void Activate()
     {
+        //holder = GameObject.FindGameObjectWithTag("DebugHolder");
+        targetList = Pathfinding.GetRandomReachableTiles(MyGridPos);
         PopDistMap();
         StartCoroutine(Move());
     }
 
     protected override IEnumerator Move()
     {
+        targetTile = MapManager.currentGrid.GetCellCenterWorld(MyGridPos);
+
         while (true)
         {
             if (!Pathfinding.IsWalkableStrict(MyGridPos))
                 yield return MoveIntoBounds();
-            if (!distanceMap.ContainsKey(MyGridPos))
-                yield return base.Move();
 
             ChooseDirection(distanceMap);
 
@@ -41,13 +51,32 @@ public class FickleDude : BadDude
         }
     }
 
+    private Vector3Int CycleNextTarget()
+    {
+        Vector3Int target = targetList[currentIndex];
+
+        if (currentIndex == targetList.Count - 1)
+            currentIndex = 0;
+        else
+            currentIndex++;
+
+        return target;
+    }
+
+    // pick 4 random tiles from reachable tiles
+    // Patrol the path between the 4 tiles
     private void PopDistMap()
     {
-        goalTile = Pathfinding.RandomTile(MapManager.PlayerGridPos, randomTileReach);
+        goalTile = CycleNextTarget();
 
         Queue<Vector3Int> queue = new();
 
         distanceMap.Clear();
+
+        //foreach (Transform item in holder.transform)
+        //{
+        //    Destroy(item.gameObject);
+        //}
 
         queue.Enqueue(goalTile);
         distanceMap[goalTile] = 0;
@@ -65,6 +94,10 @@ public class FickleDude : BadDude
                     continue;
 
                 distanceMap[neighbor] = distanceMap[current] + 1;
+
+                //GameObject debug = Instantiate(debugPrefab, MapManager.currentGrid.GetCellCenterWorld(neighbor), holder.transform.rotation, holder.transform);
+                //debugMarker = debug.GetComponent<TextMeshPro>();
+                //debugMarker.text = "" + distanceMap[neighbor];
 
                 queue.Enqueue(neighbor);
             }

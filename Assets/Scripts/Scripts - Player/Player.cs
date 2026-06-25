@@ -30,7 +30,7 @@ public class Player : MonoBehaviour
     [SerializeField] private int dashDistance = 2;
     [SerializeField] private float dashCooldown = 1f;
     [SerializeField] private float dashClock;
-    [SerializeField] private float iDashDuration = 0.5f;
+    [Tooltip("Length of dash invulnerability (seconds)")] [SerializeField] private float iDashDuration = 0.5f;
 
     private float invincibleUntil;
     public float InvincibleUntil => invincibleUntil;

@@ -6,6 +6,9 @@ using UnityEngine.Tilemaps;
 
 public class MapManager : MonoBehaviour
 {
+    public static readonly int sectorLength = 19;
+    public static readonly int sectorHalf = (sectorLength - 1) / 2; 
+
     public static int sectorGeneration = 0;
 
     public GameObject startingSector;

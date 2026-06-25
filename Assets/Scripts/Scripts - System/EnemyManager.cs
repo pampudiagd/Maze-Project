@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using static UnityEditor.Progress;
@@ -15,6 +16,10 @@ public class EnemyManager : MonoBehaviour
     public static Dictionary<Vector3Int, int> distanceMapChase = new();
     public static Dictionary<Vector3Int, int> distanceMapFlank = new();
 
+    private TextMeshPro debugMarker;
+    public GameObject debugPrefab;
+    public GameObject holder;
+
     public static EnemyManager Instance { get; private set; }
 
     public enum EnemyType // Change to associate each with a relevant enemy prefab, so that each enemy doesn't need to hold their whole prefab
@@ -22,7 +27,7 @@ public class EnemyManager : MonoBehaviour
         Chaser,
         Flanker,
         Fickle,
-        Test4,
+        Patroller,
         None
     }
 
@@ -145,6 +150,10 @@ public class EnemyManager : MonoBehaviour
         Queue<Vector3Int> queue = new();
 
         distMap.Clear();
+        //foreach (Transform item in holder.transform)
+        //{
+        //    Destroy(item.gameObject);
+        //}
 
         queue.Enqueue(targetTile);
         distMap[targetTile] = 0;
@@ -162,6 +171,10 @@ public class EnemyManager : MonoBehaviour
                     continue;
 
                 distMap[neighbor] = distMap[current] + 1;
+
+                //GameObject debug = Instantiate(debugPrefab, MapManager.currentGrid.GetCellCenterWorld(neighbor), transform.rotation, holder.transform);
+                //debugMarker = debug.GetComponent<TextMeshPro>();
+                //debugMarker.text = "" + distMap[neighbor];
 
                 queue.Enqueue(neighbor);
             }
