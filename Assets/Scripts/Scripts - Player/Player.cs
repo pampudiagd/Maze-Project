@@ -12,11 +12,19 @@ public class Player : MonoBehaviour
     public Grid grid; // The current coordinate system
     public Tilemap tilemap; // The current tiles that are interactable
 
+    public Slider equipMeterSlider;
+    public Image equipMeterFill;
+
+    public int lives = 3;
+    [SerializeField] public LivesUI livesUI;
+
     public int coinCount = 0;
     public int coinCapacity = 100;
 
     public int ammoCount = 0;
     public int ammoCapacity = 10;
+    [SerializeField] public AmmoUI ammoUI;
+
     [SerializeField] private float gunCooldown = 1f;
     [SerializeField] private float gunClock;
 
@@ -31,9 +39,6 @@ public class Player : MonoBehaviour
     [SerializeField] private int dashDistance = 2;
     [SerializeField] private float dashCooldown = 1f;
     [SerializeField] private float dashClock;
-
-    public Slider equipMeterSlider;
-    public Image equipMeterFill;
 
     [SerializeField] private Vector3Int direction = new(1, 0);
     [SerializeField] private Vector3Int storedDirection = new(1, 0);
@@ -50,11 +55,16 @@ public class Player : MonoBehaviour
 
     private Vector3Int MyGridPos => grid.WorldToCell(transform.position);
 
+    //
+
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
+
+        livesUI.SetLives(lives);
+        ammoUI.SetAmmo(ammoCount);
     }
 
     private void OnEnable()
@@ -167,7 +177,7 @@ public class Player : MonoBehaviour
     {
         Instantiate(myBullet, transform.position + transform.up, transform.rotation);
 
-        ammoCount--;
+        LoseAmmo();
         gunClock = gunCooldown;
     }
 
@@ -191,7 +201,7 @@ public class Player : MonoBehaviour
 
     private void GivePowerup()
     {
-        ammoCount = ammoCapacity;
+        GainAmmo();
     }
 
     //Light load (default, 0-24%) = 7
@@ -267,6 +277,39 @@ public class Player : MonoBehaviour
         grid = newGrid.GetComponent<Grid>();
         tilemap = newGrid.GetComponentInChildren<Tilemap>();
         updatedMap = true;
+    }
+
+    public void LoseLife()
+    {
+        if (lives > 0)
+        {
+            lives--;
+            livesUI.SetLives(lives);
+        }
+    }
+
+    public void GainLife()
+    {
+        if (lives < 10)
+        {
+            lives++;
+            livesUI.SetLives(lives);
+        }
+    }
+
+    public void LoseAmmo()
+    {
+        if (ammoCount > 0)
+        {
+            ammoCount--;
+            ammoUI.SetAmmo(ammoCount);
+        }
+    }
+
+    public void GainAmmo()
+    {
+        ammoCount = ammoCapacity; //Picking up a gun completely fills ammo, every time.
+        ammoUI.SetAmmo(ammoCount);
     }
 
 }
