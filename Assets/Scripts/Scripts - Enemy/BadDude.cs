@@ -76,6 +76,7 @@ public abstract class BadDude : MonoBehaviour
     {
         Vector3Int reverse = -myDirection;
 
+        List<Vector3Int> bestDirections = new();
         Vector3Int bestDirection = Vector3Int.zero;
         int bestDistance = int.MaxValue;
 
@@ -100,9 +101,14 @@ public abstract class BadDude : MonoBehaviour
             if (distance < bestDistance)
             {
                 bestDistance = distance;
-                bestDirection = dir;
+                bestDirections.Clear();
+                bestDirections.Add(dir);
             }
+            else if (distance == bestDistance)
+                bestDirections.Add(dir);
         }
+
+        bestDirection = bestDirections[Random.Range(0, bestDirections.Count)];
 
         // Dead-end handling.
         if (bestDirection == Vector3Int.zero)
@@ -202,7 +208,7 @@ public abstract class BadDude : MonoBehaviour
     {
         EnemyManager.Instance.StartCoroutine(EnemyManager.TriggerSingleSpawner(mySpawner, startTimer: 4.0f)); // Calls for mySpawner to spawn
         Destroy(gameObject);
-    }    
+    }
 
     protected virtual void OnTriggerExit2D(Collider2D collision)
     {

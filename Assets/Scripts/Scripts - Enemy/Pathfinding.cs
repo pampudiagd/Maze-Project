@@ -89,8 +89,15 @@ public class Pathfinding : MonoBehaviour
     // Returns true if the given Vector3Int doesn't have a solid collider AND isn't a blank space
     public static bool IsWalkableStrict(Vector3Int pos)
     {
+        TileBase tile = MapManager.currentTilemap.GetTile(pos);
+        SpecialTile specTile = tile as SpecialTile;
+
         // Tile must exist
         if (!MapManager.currentTilemap.HasTile(pos))
+            return false;
+
+        // Tile must not be set to block enemies
+        if (specTile != null && specTile.blocksEnemies)
             return false;
 
         // Tile must not be blocked
