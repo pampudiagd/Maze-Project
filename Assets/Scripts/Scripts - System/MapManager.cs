@@ -49,7 +49,7 @@ public class MapManager : MonoBehaviour
     private void Awake()
     {
         playerScript = player.GetComponent<Player>();
-        MoveSector(startingSector);
+        MoveSector(startingSector.transform.GetChild(0).gameObject);
     }
 
     private void Start()
@@ -82,6 +82,7 @@ public class MapManager : MonoBehaviour
             if (child.CompareTag("CollisionGrid"))
             {
                 gridChild = child;
+                print("GridChild is " + gridChild);
                 break;
             }
         }

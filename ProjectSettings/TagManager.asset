@@ -42,8 +42,8 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
+  - Player Sector Sensor
+  - Sector Hider
   - Pursuit
   m_SortingLayers:
   - name: Default

@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 [InitializeOnLoad]
@@ -7,15 +8,6 @@ public static class ParentRenamePropagator
 {
     // Prevent recursive hierarchy updates
     private static bool isProcessing;
-
-    // Define all child naming rules here
-    static readonly (string prefix, string baseName)[] rules =
-    {
-        ("Grid", "Grid"),
-        ("Load Zone", "Load Zone"),
-        ("Collectible Grid", "Collectible Grid"),
-        ("Enemies", "Enemies"),
-    };
 
     static ParentRenamePropagator()
     {
@@ -32,38 +24,48 @@ public static class ParentRenamePropagator
 
         try
         {
-            GameObject world = GameObject.Find("Game World");
-            if (world == null)
+            PrefabStage stage = PrefabStageUtility.GetCurrentPrefabStage();
+
+            // Only run while editing an isolated prefab.
+            if (stage == null)
                 return;
 
-            foreach (Transform parent in world.transform)
+            Transform sector = stage.prefabContentsRoot.transform;
+
+            if (!sector.name.StartsWith("Sector "))
+                return;
+
+            string suffix = sector.name.Substring("Sector ".Length);
+
+            Transform contents = FindChildStartingWith(sector, "Sector Contents");
+            if (contents == null)
+                return;
+
+            RenameSuffix(contents, suffix);
+
+            foreach (Transform child in contents)
             {
-                if (!parent.name.StartsWith("Sector "))
-                    continue;
-
-                string suffix = parent.name.Substring("Sector ".Length);
-
-                foreach (var rule in rules)
-                {
-                    Transform child = FindChildStartingWith(parent, rule.prefix);
-
-                    if (child == null)
-                        continue;
-
-                    string desired = $"{rule.baseName} {suffix}";
-
-                    // Only rename if actually different
-                    if (child.name != desired)
-                    {
-                        child.name = desired;
-                        EditorUtility.SetDirty(child.gameObject);
-                    }
-                }
+                RenameSuffix(child, suffix);
             }
         }
         finally
         {
             isProcessing = false;
+        }
+    }
+
+    static void RenameSuffix(Transform t, string suffix)
+    {
+        int lastSpace = t.name.LastIndexOf(' ');
+        if (lastSpace < 0)
+            return;
+
+        string desired = t.name.Substring(0, lastSpace + 1) + suffix;
+
+        if (t.name != desired)
+        {
+            t.name = desired;
+            EditorUtility.SetDirty(t.gameObject);
         }
     }
 
