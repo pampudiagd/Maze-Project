@@ -113,6 +113,7 @@ public class MapManager : MonoBehaviour
 
         Vector3 targetPos = currentSector.transform.position;
         targetPos.x += 0.5f;
+        targetPos.y += 0.5f;
         targetPos.z = myCamera.transform.position.z;
 
         while ((myCamera.transform.position - targetPos).sqrMagnitude > 0.001f)
