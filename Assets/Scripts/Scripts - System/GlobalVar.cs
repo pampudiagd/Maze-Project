@@ -4,40 +4,39 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class GlobalVar : MonoBehaviour
+public static class GlobalVar
 {
-    public static int score = 0;
-    public static int difficulty = 0; public static int highScore = 10000;
+    private static int score;
+    private static int highScore;
 
-    public TextMeshProUGUI scoreText;
-    public TextMeshProUGUI highScoreText;
+    public static int difficulty = 0;
 
-    void UpdateScores()
+    public static bool spawnEnemies = true;
+    public static bool spawnCoins = true;
+
+    public static int Score 
     {
-        scoreText.text = score.ToString();
-        highScoreText.text = "HI " + highScore.ToString();
-
-    }
-
-    // S T A R T
-    void Start()
-    {
-        UpdateScores();
-    }
-
-    // U P D A T E
-    void Update()
-    {
-        //Test code to make sure score can update
-        //Replace with actual conditions that award points
-        //score += 1;
-
-        //Update high score in real time
-        if (score > highScore)
+        get => score;
+        set
         {
-            highScore = score;
-        }
+            if (score == value)
+                return;
 
-        UpdateScores();
+            score = value;
+            EventManager.OnScoreChanged(score);
+
+            if(score > highScore)
+                HighScore = value;
+        }
+    }
+
+    public static int HighScore 
+    {
+        get => highScore; 
+        private set
+        {
+            highScore = value;
+            EventManager.OnHighScoreChanged(highScore);
+        }
     }
 }

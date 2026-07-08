@@ -11,9 +11,13 @@ public class GameManager : MonoBehaviour
     public int gridLength;
 
     private GameObject[] sectorPrefabs;
+    [SerializeField] private GlobalSettings settings;
 
     private void Awake()
     {
+        GlobalVar.spawnEnemies = settings.allowEnemySpawns;
+        GlobalVar.spawnCoins = settings.allowCoins;
+
         sectorGrid = GetComponent<Grid>();
         LoadSectors();
     }

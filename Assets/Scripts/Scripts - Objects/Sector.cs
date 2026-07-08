@@ -39,7 +39,11 @@ public class Sector : MonoBehaviour
         print("Number of coins: " + coinsTotal);
 
         foreach (Coin item in GetComponentsInChildren<Coin>(true))
+        {
             item.mySector = this;
+            if (!GlobalVar.spawnCoins)
+                item.gameObject.SetActive(false);
+        }
     }
 
     // Determines what state of completion the Sector is in

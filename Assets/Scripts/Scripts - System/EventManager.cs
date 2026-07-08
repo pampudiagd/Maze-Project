@@ -15,4 +15,7 @@ public static class EventManager
     public static Action OnBankFilled;
     public static Action OnPlayerMoved;
 
+    public static Action<int> OnScoreChanged;
+    public static Action<int> OnHighScoreChanged;
+
 }

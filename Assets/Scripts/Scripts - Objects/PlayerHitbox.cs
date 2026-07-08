@@ -22,8 +22,8 @@ public class PlayerHitbox : MonoBehaviour
             {
                 int deposited = bank.DepositCoins(player.coinCount);
 
-                GlobalVar.score += (deposited * 10);
-                print("Current Score: " + GlobalVar.score);
+                GlobalVar.Score += (deposited * 10);
+                print("Current Score: " + GlobalVar.Score);
 
                 player.coinCount -= deposited;
                 player.CalculateWeight();

@@ -86,6 +86,12 @@ public class EnemyManager : MonoBehaviour
     // Tells every spawner in the spawner list to run their SpawnEnemy function and staggers spawns by specified spawnTimer amount of time, or the default set by spawnerInterval
     public static IEnumerator TriggerSpawners(float spawnTimer = spawnerInterval, float startTimer = initialDelay)
     {
+        if (!GlobalVar.spawnEnemies)
+        {
+            print("Enemy spawning has been disabled in GlobalVar.");
+            yield break;
+        }
+        
         print("Attempting multiple spawns");
         int thisGeneration = MapManager.sectorGeneration;
         yield return new WaitForSeconds(startTimer);

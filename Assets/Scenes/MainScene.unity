@@ -15958,6 +15958,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sectorGrid: {fileID: 0}
   gridLength: 0
+  settings: {fileID: 11400000, guid: ae40617a63aa63e46a0f900140a3784f, type: 2}
 --- !u!1 &1604523359 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7055555725954503421, guid: 7d9b0fa891b2fef4c9990d92f296f940, type: 3}
