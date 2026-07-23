@@ -17,6 +17,7 @@ public class PauseMenu : MonoBehaviour
 
     public GameObject pauseMenuUI;
     public GameObject optionsMenuUI;
+    public GameObject rebindMenuUI;
 
     //Get audio mixers for volume sliders
     public AudioMixer musicMixer;
@@ -53,6 +54,12 @@ public class PauseMenu : MonoBehaviour
             optionsMenuUI.SetActive(false);
         }
 
+        //Deactivate rebind menu
+        if (rebindMenuUI != null)
+        {
+            rebindMenuUI.SetActive(false);
+        }
+
         //Reset timescale and pause variables to normal
         Time.timeScale = 1f;
         gameIsPaused = false;
@@ -71,10 +78,9 @@ public class PauseMenu : MonoBehaviour
         gameIsPaused = true;
     }
 
-    // L O A D    M E N U
+    // L O A D    O P T I O N S   M E N U
 
-    //I should rename this to the more specific "load options" but I want to make sure it works first
-    public void LoadMenu()
+    public void LoadOptionsMenu()
     {
 
         //Show Options Menu
@@ -83,10 +89,31 @@ public class PauseMenu : MonoBehaviour
             optionsMenuUI.SetActive(true);
         }
 
-        //Hide Pause Menu
+        //Hide Pause Menu and Rebind Menu
         if (pauseMenuUI != null)
         {
             pauseMenuUI.SetActive(false);
+        }
+
+        if (rebindMenuUI != null)
+        {
+            rebindMenuUI.SetActive(false);
+        }
+    }
+
+    // L O A D   R E B I N D   M E N U
+    public void LoadRebindMenu()
+    {
+        //Show Rebind Menu
+        if (rebindMenuUI != null)
+        {
+            rebindMenuUI.SetActive(true);
+        }
+
+        //Hide Options Menu
+        if (optionsMenuUI != null)
+        {
+            optionsMenuUI.SetActive(false);
         }
     }
 
@@ -145,46 +172,21 @@ public class PauseMenu : MonoBehaviour
     {
 
         isInitializing = true;
-        Debug.Log("Width: " + Screen.width);
-        Debug.Log("Height: " + Screen.height);
 
-        //Debug: Assign pause and options menu UI if null
         if (pauseMenuUI == null)
         {
-            Debug.LogError("Pause Menu is null at start!");
             pauseMenuUI = GameObject.Find("PauseMenu");
-            if (pauseMenuUI == null)
-            {
-                Debug.LogError("Pause Menu's still null after using GameObject.Find()!");
-            }
-            else
-            {
-                Debug.Log("OK, now Pause Menu's assigned.");
-            }
-        }
-        else
-        {
-            Debug.Log("Pause Menu successfully assigned at start.");
         }
 
         if (optionsMenuUI == null)
         {
-            Debug.LogError("Options Menu is null at start!");
             optionsMenuUI = GameObject.Find("OptionsMenu");
-            if (optionsMenuUI == null)
-            {
-                Debug.LogError("Options Menu's still null after using GameObject.Find()!");
-            }
-            else
-            {
-                Debug.Log("OK, now Options Menu's assigned.");
-            }
         }
-        else
+
+        if (rebindMenuUI == null)
         {
-            Debug.Log("Options Menu successfully assigned at start.");
+            rebindMenuUI = GameObject.Find("RebindMenu");
         }
-        //End Debug
 
         //Get player's screen resolutions + refresh rate
         allResolutions = Screen.resolutions;
@@ -233,34 +235,10 @@ public class PauseMenu : MonoBehaviour
     }
 
 
-
     // U P D A T E
     // Update is called once per frame
     void Update()
     {
-        //Debug
-        if (pauseMenuUI == null)
-        {
-            Debug.LogWarning("Pause Menu is still null in update.");
-            pauseMenuUI = GameObject.Find("PauseMenu");
-
-            if (pauseMenuUI == null)
-            {
-                Debug.LogError("Pause Menu is still null in update even after using GameObject.Find.");
-            }
-        }
-
-        if (optionsMenuUI == null)
-        {
-            Debug.LogWarning("Options Menu is still null in update.");
-            optionsMenuUI = GameObject.Find("OptionsMenu");
-
-            if (optionsMenuUI == null)
-            {
-                Debug.LogError("Options Menu is still null in update even after using GameObject.Find.");
-            }
-        }
-        //End Debug
 
         //Hit escape to pause/unpause (replace this later with remappable keys)
         if (Input.GetKeyDown(KeyCode.Escape))
