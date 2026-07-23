@@ -5,7 +5,7 @@ using UnityEngine;
 public class Bank : MonoBehaviour
 {
     public Sector mySector;
-    public int maxCapacity = 20;
+    public int maxCapacity = 100;
     public int currentCoins = 0;
     private GameObject nukeBox;
 

@@ -5,6 +5,7 @@ using UnityEditor.Build;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.UI;
+using TMPro;
 using System;
 
 public class Player : MonoBehaviour
@@ -28,7 +29,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float gunCooldown = 1f;
     [SerializeField] private float gunClock;
 
-    //Speed should be public since it changes dynamically with equip load
+    //Speed is public since it changes dynamically with equip load
     //Light load (default, 0-24%) = 7
     //Med light load (25-49%) = 6
     //Med heavy load (50-74%) = 5
@@ -63,6 +64,26 @@ public class Player : MonoBehaviour
 
     public Vector3Int MyGridPos => grid.WorldToCell(transform.position);
 
+    //Key binding variables
+
+    public KeyCode dashKey = KeyCode.Space;
+    public KeyCode fireKey = KeyCode.LeftShift;
+
+    public TMP_Text dashKeyText;
+    public TMP_Text fireKeyText;
+
+    private bool rebindingKey = false;
+
+    private enum RebindAction
+    {
+        None,
+        Dash,
+        Fire
+    }
+
+    private RebindAction actionToRebind = RebindAction.None;
+
+    // S T A R T
     // Start is called before the first frame update
     void Start()
     {
@@ -92,6 +113,19 @@ public class Player : MonoBehaviour
         if (gunClock > 0)
             gunClock = Timer(gunClock);
         ICheck();
+
+        //Input Rebinding Stuff
+        if (rebindingKey)
+        {
+            foreach (KeyCode key in System.Enum.GetValues(typeof(KeyCode)))
+            {
+                if (Input.GetKeyDown(key))
+                {
+                    UpdateKey(key);
+                    break;
+                }
+            }
+        }
     }
 
     // Update is called once per frame
@@ -275,10 +309,55 @@ public class Player : MonoBehaviour
             direction.y = Mathf.RoundToInt(Input.GetAxisRaw("Vertical"));
             direction.x = 0;
         }
-        if (Input.GetKey(KeyCode.LeftShift) && dashClock <= 0)
+        if (Input.GetKey(dashKey) && dashClock <= 0)
             wantToDash = true;
-        else if (Input.GetKey(KeyCode.Space) && ammoCount > 0 && gunClock <= 0)
+        else if (Input.GetKey(fireKey) && ammoCount > 0 && gunClock <= 0)
             FireBullet();
+    }
+
+    //The following code is for changing input bindings.
+
+    //Here's the flow of things:
+    //KeyClicked[Action] is called when the button is pressed. It flips rebindingKey to true.
+    //Then in Update(), if rebindingKey is true, the system awaits input.
+    //Once input is provided, UpdateKey() is called and updates the key.
+    //Then it sets rebindingKey to false again, returning to normal.
+
+    private void UpdateKey(KeyCode newKey)
+    {
+        //Since we only have two keys, this goes through them manually,
+        //to keep the code as easy to understand as possible.
+        //However, if we add more, this should be redone with a dictionary.
+
+        switch(actionToRebind)
+        {
+            case RebindAction.Dash:
+                dashKey = newKey;
+                dashKeyText.text = newKey.ToString();
+                break;
+
+            case RebindAction.Fire:
+                fireKey = newKey;
+                fireKeyText.text = newKey.ToString();
+                break;
+        }
+
+        rebindingKey = false;
+        actionToRebind = RebindAction.None;
+    }
+
+    public void KeyClickedDash()
+    {
+        actionToRebind = RebindAction.Dash;
+        rebindingKey = true;
+        dashKeyText.text = "Press any key";
+    }
+
+    public void KeyClickedFire()
+    {
+        actionToRebind = RebindAction.Fire;
+        rebindingKey = true;
+        fireKeyText.text = "Press any key";
     }
 
     public void Death()

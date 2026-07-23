@@ -7,7 +7,7 @@ using static UnityEditor.Progress;
 
 public class EnemyManager : MonoBehaviour
 {
-    public const float spawnerInterval = 1f;
+    public const float spawnerInterval = 2f;
     public const float initialDelay = 1f;
 
     public static GameObject currentEnemyList = null;
