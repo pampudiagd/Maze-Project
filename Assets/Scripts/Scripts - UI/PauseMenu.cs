@@ -145,14 +145,16 @@ public class PauseMenu : MonoBehaviour
     public void SetMusicVolume(float musicVolume)
     {
         //Set the music mixer exposed parameter "musicVolume" to the float we take as input from the slider
-        musicMixer.SetFloat("musicVolume", musicVolume);
+        //The math makes it logarithmic, to keep it within human hearing range
+        musicMixer.SetFloat("musicVolume", Mathf.Log10 (musicVolume) * 20);
     }
 
     //S F X   S L I D E R
     public void SetSFXVolume(float sfxVolume)
     {
         //Set the sfx mixer exposed parameter "sfxVolume" to the float we take as input from the slider
-        sfxMixer.SetFloat("sfxVolume", sfxVolume);
+        //The math makes it logarithmic, to keep it within human hearing range
+        sfxMixer.SetFloat("sfxVolume", Mathf.Log10 (sfxVolume) * 20);
     }
 
     // S E T   R E S O L U T I O N
