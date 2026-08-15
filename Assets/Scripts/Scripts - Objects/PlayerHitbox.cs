@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerHitbox : MonoBehaviour
 {
@@ -35,7 +36,8 @@ public class PlayerHitbox : MonoBehaviour
             {
                 GetComponent<CircleCollider2D>().gameObject.SetActive(false);
                 player.isDead = true;
-                print("<<<<<<<<<<GAME OVER>>>>>>>>>>>");
+                print("<<<<<<<<<<GAME OVER>>>>>>>>>>>"); // Move Scene change logic later!!!!
+                SceneManager.LoadScene(0);
             }
         }
     }

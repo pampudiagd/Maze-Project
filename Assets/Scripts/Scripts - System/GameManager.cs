@@ -10,6 +10,8 @@ public class GameManager : MonoBehaviour
     public Grid sectorGrid;
     public int gridLength;
 
+    public MapManager mapManager;
+
     private GameObject[] sectorPrefabs;
     [SerializeField] private GlobalSettings settings;
 
@@ -19,6 +21,7 @@ public class GameManager : MonoBehaviour
         GlobalVar.spawnCoins = settings.allowCoins;
 
         sectorGrid = GetComponent<Grid>();
+        mapManager = GetComponent<MapManager>();
         LoadSectors();
     }
 
@@ -56,17 +59,35 @@ public class GameManager : MonoBehaviour
         //    print(sectorPrefabs[i].name + " " + ReadSectorID(sectorPrefabs[i].name.Substring(sectorPrefabs[i].name.LastIndexOf(' ') + 1)));
         //}
 
+        GameObject startingSector = null;
         int listIndex = 0;
         for (int j = 0; j < gridLength; j++)
         {
             for (int i = 0; i < gridLength; i++)
             {
                 GameObject instance = Instantiate(sectorPrefabs[listIndex], sectorGrid.CellToWorld(new Vector3Int(i,-j)), transform.rotation, gameObject.transform);
+
+                Sector sector = instance.GetComponent<Sector>();
+                if (sector.startSector)
+                {
+                    if (startingSector != null)
+                        Debug.LogError("Multiple start Sectors have been assigned!");
+                    startingSector = instance;
+                }
+
                 listIndex++;
                 if (listIndex >= sectorPrefabs.Length)
                     break;
             }
         }
+
+        if (startingSector == null)
+        {
+            Debug.LogError("No start Sector has been assigned!");
+            return;
+        }
+
+        mapManager.FirstMoveSector(startingSector);
 
         //foreach (GameObject p in sectorPrefabs)
         //{

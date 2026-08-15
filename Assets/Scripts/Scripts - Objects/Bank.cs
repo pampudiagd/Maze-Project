@@ -37,6 +37,7 @@ public class Bank : MonoBehaviour
 
     private IEnumerator BankNuke()
     {
+        print("Clearing Enemies!");
         nukeBox.SetActive(true);
         for (int i = 0; i < 80; i++)
         {

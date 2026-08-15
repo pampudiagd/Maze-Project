@@ -7,11 +7,10 @@ using UnityEngine.Tilemaps;
 public class MapManager : MonoBehaviour
 {
     public static readonly int sectorLength = 19;
-    public static readonly int sectorHalf = (sectorLength - 1) / 2; 
+    public static readonly int sectorHalf = (sectorLength - 1) / 2;
 
     public static int sectorGeneration = 0;
 
-    public GameObject startingSector;
     public static GameObject currentSector;
     public static Grid currentGrid;
     public static Tilemap currentTilemap;
@@ -48,8 +47,7 @@ public class MapManager : MonoBehaviour
 
     private void Awake()
     {
-        playerScript = player.GetComponent<Player>();
-        MoveSector(startingSector.transform.GetChild(0).gameObject);
+
     }
 
     private void Start()
@@ -70,8 +68,15 @@ public class MapManager : MonoBehaviour
             print("-----------WIN------------");
     }
 
+    public void FirstMoveSector(GameObject Sector)
+    {
+        playerScript = player.GetComponent<Player>();
+        MoveSector(Sector);
+    }
+
     private void MoveSector(GameObject Sector)
     {
+        Sector = Sector.transform.GetChild(0).gameObject;
         sectorGeneration++;
         currentSector = Sector;
         print(currentSector.name);
@@ -97,13 +102,13 @@ public class MapManager : MonoBehaviour
         else
             StartCoroutine(EnemyManager.TriggerSpawners(startTimer: 1.5f));
 
+        StartCoroutine(CamMove());
+
         if (startMode)
         {
+            player.transform.position = currentGrid.GetCellCenterWorld(new Vector3Int(2, 0, 0));
             startMode = false;
-            return;
         }
-
-        StartCoroutine(CamMove());
     }
 
     // Freeze game
@@ -116,11 +121,20 @@ public class MapManager : MonoBehaviour
         targetPos.y += 0.5f;
         targetPos.z = myCamera.transform.position.z;
 
-        while ((myCamera.transform.position - targetPos).sqrMagnitude > 0.001f)
+        if (!startMode)
         {
-            myCamera.transform.position = Vector3.MoveTowards(myCamera.transform.position, targetPos, camMoveSpeed * Time.unscaledDeltaTime);
+            while ((myCamera.transform.position - targetPos).sqrMagnitude > 0.001f)
+            {
+                myCamera.transform.position = Vector3.MoveTowards(myCamera.transform.position, targetPos, camMoveSpeed * Time.unscaledDeltaTime);
+                yield return null;
+            }
+        }
+        else
+        {
+            myCamera.transform.position = targetPos;
             yield return null;
         }
+
         Time.timeScale = 1f;
     }
 

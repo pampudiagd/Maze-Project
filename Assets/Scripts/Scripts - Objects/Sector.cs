@@ -10,6 +10,8 @@ public class Sector : MonoBehaviour
     public bool bankFilled = false;
     public bool completionMark = false; // Prevents the Sector progressing the win condition again every time its completion is calculated
 
+    public bool startSector = false;
+
     public enum SectorCompletionState
     {
         None,

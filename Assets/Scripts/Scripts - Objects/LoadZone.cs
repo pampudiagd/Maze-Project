@@ -9,6 +9,6 @@ public class LoadZone : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.layer == LayerMask.NameToLayer("Player") && transform.parent.gameObject != MapManager.currentSector)
-            EventManager.OnZoneEnter.Invoke(mySector.transform.GetChild(0).gameObject);
+            EventManager.OnZoneEnter.Invoke(mySector);
     }
 }

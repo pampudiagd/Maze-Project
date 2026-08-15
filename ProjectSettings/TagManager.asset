@@ -9,7 +9,6 @@ TagManager:
   - EnemyList
   - Spawner
   - Coin
-  - BankNuke
   - BankAttack
   - DebugHolder
   layers:

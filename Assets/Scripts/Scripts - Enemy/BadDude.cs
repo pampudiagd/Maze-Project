@@ -194,7 +194,7 @@ public abstract class BadDude : MonoBehaviour
 
     protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Bullet") || collision.CompareTag("BankNuke"))
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Bullet") || collision.CompareTag("BankAttack"))
             Death();
         else if (collision.gameObject.layer == LayerMask.NameToLayer("Pursuit"))
         {

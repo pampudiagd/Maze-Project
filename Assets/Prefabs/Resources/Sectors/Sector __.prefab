@@ -9,8 +9,8 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 996874626293517645, guid: 7d9b0fa891b2fef4c9990d92f296f940, type: 3}
-      propertyPath: m_Name
-      value: Load Zone __
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1546838098246224747, guid: 7d9b0fa891b2fef4c9990d92f296f940, type: 3}
       propertyPath: m_Name
