@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23cc1440b9f630a488b91a9647393954, type: 3}
   m_Name: Global Settings
   m_EditorClassIdentifier: 
-  allowEnemySpawns: 1
+  allowEnemySpawns: 0
   allowCoins: 1
