@@ -145,7 +145,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mySector: {fileID: 0}
-  maxCapacity: 20
+  maxCapacity: 100
   currentCoins: 0
 --- !u!1 &8764746439810797690
 GameObject:

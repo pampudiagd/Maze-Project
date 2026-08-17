@@ -214,6 +214,12 @@ public class Player : MonoBehaviour
             Vector2 newPos = Vector2.MoveTowards(transform.position, grid.GetCellCenterWorld(dashTarget), dashSpeedMultiplier * Time.fixedDeltaTime);
             rb.MovePosition(newPos);
             yield return new WaitForFixedUpdate();
+            if (updatedMap)
+            {
+                updatedMap = false;
+                invincibleUntil = 0;
+                break;
+            }
         }
         
         dashClock = dashCooldown;
