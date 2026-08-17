@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afc16b9b471b1994893f2b8a626209c3, type: 3}
   m_Name: CoinPlacer
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: 21300000, guid: c048e1f423e110e4d989a570aec06420, type: 3}
+  m_Sprite: {fileID: 21300000, guid: d09aaedefbdcb4846acaa23b838e2e67, type: 3}
   m_Color: {r: 0, g: 1, b: 0.37437844, a: 1}
   m_Transform:
     e00: 1
@@ -34,4 +34,4 @@ MonoBehaviour:
   m_InstancedGameObject: {fileID: 560771536120064148, guid: 60e3411de6db85341b617493136c32ec, type: 3}
   m_Flags: 1
   m_ColliderType: 0
-  test: 1
+  blocksEnemies: 0
