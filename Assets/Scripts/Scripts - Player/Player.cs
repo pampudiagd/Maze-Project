@@ -28,6 +28,7 @@ public class Player : MonoBehaviour
 
     [SerializeField] private float gunCooldown = 1f;
     [SerializeField] private float gunClock;
+    [SerializeField] private Bullet.BulletType currentBulletType;
 
     //Speed is public since it changes dynamically with equip load
     //Light load (default, 0-24%) = 7
@@ -244,7 +245,8 @@ public class Player : MonoBehaviour
 
     private void FireBullet()
     {
-        Instantiate(myBullet, transform.position + transform.up, transform.rotation);
+        GameObject bulletInstance = Instantiate(myBullet, transform.position + transform.up, transform.rotation);
+        bulletInstance.GetComponent<Bullet>().type = currentBulletType;
 
         LoseAmmo();
         gunClock = gunCooldown;
@@ -267,8 +269,9 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void GivePowerup()
+    private void GivePowerup(Bullet.BulletType bulletType)
     {
+        currentBulletType = bulletType;
         GainAmmo();
     }
 

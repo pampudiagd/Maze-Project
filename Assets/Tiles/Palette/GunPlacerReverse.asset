@@ -9,11 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: afc16b9b471b1994893f2b8a626209c3, type: 3}
-  m_Name: GunPlacer
+  m_Script: {fileID: 11500000, guid: 854326daf5309d240bdf687637c82918, type: 3}
+  m_Name: GunPlacerReverse
   m_EditorClassIdentifier: 
   m_Sprite: {fileID: 7482667652216324306, guid: 75f5f34dc1b5347e0b8351032682f224, type: 3}
-  m_Color: {r: 0, g: 0.17871141, b: 1, a: 1}
+  m_Color: {r: 0, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1
     e01: 0
@@ -33,4 +33,5 @@ MonoBehaviour:
     e33: 1
   m_InstancedGameObject: {fileID: 2262363617215206544, guid: e30692f4f1e680d46b22896defddc3ff, type: 3}
   m_Flags: 1
-  m_ColliderType: 0
+  m_ColliderType: 1
+  myType: 1
