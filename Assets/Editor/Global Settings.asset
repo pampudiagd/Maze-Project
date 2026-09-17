@@ -14,3 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   allowEnemySpawns: 1
   allowCoins: 1
+  startWithGun: 1
+  gunType: 2

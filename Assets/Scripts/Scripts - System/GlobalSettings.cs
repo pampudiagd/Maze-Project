@@ -7,4 +7,7 @@ public class GlobalSettings : ScriptableObject
 {
     public bool allowEnemySpawns = true;
     public bool allowCoins = true;
+
+    public bool startWithGun = false;
+    public Bullet.BulletType gunType = Bullet.BulletType.Default;
 }

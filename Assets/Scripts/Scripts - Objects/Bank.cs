@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Bank : MonoBehaviour
 {
@@ -9,9 +11,12 @@ public class Bank : MonoBehaviour
     public int currentCoins = 0;
     private GameObject nukeBox;
 
+    [SerializeField] private Slider slider;
+
     private void Start()
     {
         nukeBox = transform.GetChild(0).gameObject;
+        slider.maxValue = maxCapacity;
     }
 
     public int DepositCoins(int amount)
@@ -22,6 +27,9 @@ public class Bank : MonoBehaviour
         int accepted = Mathf.Min(amount, spaceLeft);
 
         currentCoins += accepted;
+
+        UpdateFillBar();
+
         if (currentCoins >= maxCapacity)
             Filled();
         return accepted;
@@ -46,5 +54,10 @@ public class Bank : MonoBehaviour
         }
         nukeBox.transform.localScale = Vector3.one;
         nukeBox.SetActive(false);
+    }
+
+    private void UpdateFillBar()
+    {
+        slider.value = currentCoins;
     }
 }

@@ -19,6 +19,8 @@ public class GameManager : MonoBehaviour
     {
         GlobalVar.spawnEnemies = settings.allowEnemySpawns;
         GlobalVar.spawnCoins = settings.allowCoins;
+        GlobalVar.gunStart = settings.startWithGun;
+        GlobalVar.startGunType = settings.gunType;
 
         sectorGrid = GetComponent<Grid>();
         mapManager = GetComponent<MapManager>();

@@ -101,7 +101,7 @@ public class EnemyManager : MonoBehaviour
             if (spawner.myEnemy != null)
                 continue;
 
-            yield return new WaitForSeconds(spawnTimer);
+            yield return spawner.Countdown(spawnTimer);
 
             if (thisGeneration != MapManager.sectorGeneration)
                 break;
@@ -114,7 +114,7 @@ public class EnemyManager : MonoBehaviour
     {
         print("Attempting single spawn");
         int thisGeneration = MapManager.sectorGeneration;
-        yield return new WaitForSeconds(startTimer);
+        yield return spawner.Countdown(startTimer);
 
         if (spawner.myEnemy != null || thisGeneration != MapManager.sectorGeneration)
             yield break;

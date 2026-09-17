@@ -14,6 +14,9 @@ public static class GlobalVar
     public static bool spawnEnemies = true;
     public static bool spawnCoins = true;
 
+    public static bool gunStart = false;
+    public static Bullet.BulletType startGunType;
+
     public static int Score 
     {
         get => score;

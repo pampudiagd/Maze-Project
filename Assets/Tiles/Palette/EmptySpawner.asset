@@ -31,6 +31,7 @@ MonoBehaviour:
     e31: 0
     e32: 0
     e33: 1
-  m_InstancedGameObject: {fileID: 1724071029398365994, guid: 3439a25e9ac9c4e40b38c7a7bfa28ca7, type: 3}
+  m_InstancedGameObject: {fileID: 8223803908833648299, guid: ba031daddffd4ba42824c19ef97e2af2, type: 3}
   m_Flags: 1
   m_ColliderType: 0
+  blocksEnemies: 0

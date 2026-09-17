@@ -93,6 +93,9 @@ public class Player : MonoBehaviour
 
         livesUI.SetLives(lives);
         ammoUI.SetAmmo(ammoCount);
+
+        if (GlobalVar.gunStart)
+            GivePowerup(GlobalVar.startGunType);
     }
 
     private void OnEnable()
@@ -245,7 +248,7 @@ public class Player : MonoBehaviour
 
     private void FireBullet()
     {
-        GameObject bulletInstance = Instantiate(myBullet, transform.position + transform.up, transform.rotation);
+        GameObject bulletInstance = Instantiate(myBullet, transform.position, transform.rotation);
         bulletInstance.GetComponent<Bullet>().type = currentBulletType;
 
         LoseAmmo();

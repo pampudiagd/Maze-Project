@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Spawner : MonoBehaviour
 {
@@ -10,8 +11,11 @@ public class Spawner : MonoBehaviour
 
     [SerializeField] private EnemyPrefabDatabase database;
 
+    [SerializeField] private Slider slider;
+
     private void Awake()
     {
+        slider.gameObject.SetActive(false);
         enemyPrefab = database.prefabs[(int)myType];
     }
 
@@ -35,6 +39,25 @@ public class Spawner : MonoBehaviour
     {
         FillSpawner(myType);
         EventManager.OnBankFilled -= ResetOriginal;
+    }
+
+    public IEnumerator Countdown(float spawnTimerDuration)
+    {
+        slider.value = 1f;
+        slider.gameObject.SetActive(true);
+
+        float timer = spawnTimerDuration;
+
+        while (timer > 0f)
+        {
+            timer -= Time.deltaTime;
+
+            slider.value = timer / spawnTimerDuration;
+
+            yield return null;
+        }
+        
+        slider.gameObject.SetActive(false);
     }
 
     public void SpawnEnemy()

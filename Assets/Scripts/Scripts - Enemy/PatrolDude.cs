@@ -63,8 +63,7 @@ public class PatrolDude : BadDude
         return target;
     }
 
-    // pick 4 random tiles from reachable tiles
-    // Patrol the path between the 4 tiles
+    // Cycles the next target tile in targetList, and fills the distance map in relation to that tile
     private void PopDistMap()
     {
         goalTile = CycleNextTarget();

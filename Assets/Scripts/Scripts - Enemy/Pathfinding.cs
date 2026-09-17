@@ -183,6 +183,7 @@ public class Pathfinding : MonoBehaviour
         return target;
     }
 
+    // Returns a list of 4 Vector3Int positions that can be reached from the given start tile
     public static List<Vector3Int> GetRandomReachableTiles(Vector3Int start)
     {
         Queue<Vector3Int> queue = new();
