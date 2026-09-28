@@ -32,7 +32,8 @@ public class PlayerHitbox : MonoBehaviour
         }
         else if (collision.gameObject.layer == LayerMask.NameToLayer("Enemy"))
         {
-            if (Time.time > player.InvincibleUntil)
+            // Checks that the Dash invincibility timer isn't active and the player isn't sliding
+            if (Time.time > player.InvincibleUntil && player.myState == Player.PlayerState.Default) 
             {
                 GetComponent<CircleCollider2D>().gameObject.SetActive(false);
                 player.isDead = true;

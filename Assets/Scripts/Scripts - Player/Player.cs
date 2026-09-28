@@ -10,6 +10,14 @@ using System;
 
 public class Player : MonoBehaviour
 {
+    public enum PlayerState
+    {
+        Default,
+        Sliding
+    };
+
+    public PlayerState myState = PlayerState.Default;
+
     public Grid grid; // The current coordinate system
     public Tilemap tilemap; // The current tiles that are interactable
 
@@ -41,7 +49,7 @@ public class Player : MonoBehaviour
     [SerializeField] private int dashDistance = 2;
     [SerializeField] private float dashCooldown = 1f;
     [SerializeField] private float dashClock;
-    [Tooltip("Length of dash invulnerability (seconds)")] [SerializeField] private float iDashDuration = 0.5f;
+    [Tooltip("Length of dash invulnerability (seconds)")][SerializeField] private float iDashDuration = 0.5f;
 
     private float invincibleUntil;
     public float InvincibleUntil => invincibleUntil;
@@ -57,7 +65,12 @@ public class Player : MonoBehaviour
     [SerializeField] private bool wantToDash = false;
     private bool updatedMap = false;
     private Rigidbody2D rb;
-    private SpriteRenderer sr;
+    public SpriteRenderer mySprite;
+
+    private float wobbleAngle = 0f;
+    private readonly float wobbleMax = 30f;
+    private int wobbleDir = 1;
+    private readonly float wobbleSpeed = 520f;
 
     public GameObject myBullet;
 
@@ -89,7 +102,6 @@ public class Player : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        sr = GetComponent<SpriteRenderer>();
 
         livesUI.SetLives(lives);
         ammoUI.SetAmmo(ammoCount);
@@ -112,6 +124,14 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
+        if (myState == PlayerState.Sliding)
+            Wobble();
+        else
+        {
+            wobbleAngle = 0f;
+            mySprite.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+        }
+
         if (dashClock > 0)
             dashClock = Timer(dashClock);
         if (gunClock > 0)
@@ -135,10 +155,17 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        if (SlideTile.touchingPlayer > 0)
+            myState = PlayerState.Sliding;
+        else
+            myState = PlayerState.Default;
+
+
         if (isDead)
             return;
 
         InputReader();
+
         if (wantToDash && dashClock <= 0 && speed >= 4) //speed>=4 makes sure dashing is impossible when overburdened
                                                         //this should be changed to directly check the equip load variable once that exists
             StartCoroutine(Dash());
@@ -154,7 +181,7 @@ public class Player : MonoBehaviour
         isMoving = true;
 
         // Check if the latest input direction points to an open tile
-        if (tilemap.GetColliderType(MyGridPos + direction) == Tile.ColliderType.None)
+        if (tilemap.GetColliderType(MyGridPos + direction) == Tile.ColliderType.None && myState == PlayerState.Default)
         {
             storedDirection = direction; // Updates the Vector used to determine the next tile for movement
 
@@ -200,7 +227,7 @@ public class Player : MonoBehaviour
         isMoving = true;
 
         invincibleUntil = Time.time + iDashDuration;
-        sr.color = Color.red;
+        mySprite.color = Color.red;
 
         adjacentTile = MyGridPos;
 
@@ -225,14 +252,14 @@ public class Player : MonoBehaviour
                 break;
             }
         }
-        
+
         dashClock = dashCooldown;
         wantToDash = false;
         isMoving = false;
     }
 
     private void ICheck()
-    { 
+    {
         currentlyInvincible = Time.time < invincibleUntil;
 
         if (wasInvincible && !currentlyInvincible)
@@ -243,7 +270,7 @@ public class Player : MonoBehaviour
 
     private void IFramesEnded()
     {
-        sr.color = Color.white;
+        mySprite.color = Color.white;
     }
 
     private void FireBullet()
@@ -302,7 +329,7 @@ public class Player : MonoBehaviour
         {
             < 0.24f => Color.green,
             < 0.49f => Color.yellow,
-            < 0.74f => new Color32(255,128,0,255), //orange
+            < 0.74f => new Color32(255, 128, 0, 255), //orange
             < 0.99f => Color.red,
             _ => Color.red //just red for now, may change later
         };
@@ -321,10 +348,13 @@ public class Player : MonoBehaviour
             direction.y = Mathf.RoundToInt(Input.GetAxisRaw("Vertical"));
             direction.x = 0;
         }
-        if (Input.GetKey(dashKey) && dashClock <= 0)
-            wantToDash = true;
-        else if (Input.GetKey(fireKey) && ammoCount > 0 && gunClock <= 0)
-            FireBullet();
+        if (myState == PlayerState.Default)
+        {
+            if (Input.GetKey(dashKey) && dashClock <= 0)
+                wantToDash = true;
+            else if (Input.GetKey(fireKey) && ammoCount > 0 && gunClock <= 0)
+                FireBullet();
+        }
     }
 
     //The following code is for changing input bindings.
@@ -341,7 +371,7 @@ public class Player : MonoBehaviour
         //to keep the code as easy to understand as possible.
         //However, if we add more, this should be redone with a dictionary.
 
-        switch(actionToRebind)
+        switch (actionToRebind)
         {
             case RebindAction.Dash:
                 dashKey = newKey;
@@ -415,6 +445,24 @@ public class Player : MonoBehaviour
     {
         ammoCount = ammoCapacity; //Picking up a gun completely fills ammo, every time.
         ammoUI.SetAmmo(ammoCount);
+    }
+
+    private void Wobble()
+    {
+        wobbleAngle += wobbleSpeed * wobbleDir * Time.deltaTime;
+
+        if (wobbleAngle >= wobbleMax)
+        {
+            wobbleAngle = wobbleMax;
+            wobbleDir = -1;
+        }
+        else if (wobbleAngle <= -wobbleMax)
+        {
+            wobbleAngle = -wobbleMax;
+            wobbleDir = 1;
+        }
+
+        mySprite.transform.localRotation = Quaternion.Euler(0f, 0f, wobbleAngle);
     }
 
 }
