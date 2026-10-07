@@ -44,7 +44,21 @@ public class Player : MonoBehaviour
     //Med heavy load (50-74%) = 5
     //Heavy load (75-99%) = 4
     //Overburdened (100%) = 2
-    public int speed = 7;
+
+    public int baseSpeed = 7;
+    private int Speed
+    {
+        get
+        {
+            if (myState == PlayerState.Sliding)
+            {
+                return baseSpeed + dashSpeedMultiplier;
+            }
+            else
+                return baseSpeed;
+        }
+    }
+
     [SerializeField] private int dashSpeedMultiplier = 4;
     [SerializeField] private int dashDistance = 2;
     [SerializeField] private float dashCooldown = 1f;
@@ -166,7 +180,7 @@ public class Player : MonoBehaviour
 
         InputReader();
 
-        if (wantToDash && dashClock <= 0 && speed >= 4) //speed>=4 makes sure dashing is impossible when overburdened
+        if (wantToDash && dashClock <= 0 && baseSpeed >= 4) //speed>=4 makes sure dashing is impossible when overburdened
                                                         //this should be changed to directly check the equip load variable once that exists
             StartCoroutine(Dash());
         else
@@ -202,7 +216,7 @@ public class Player : MonoBehaviour
         {
             while ((transform.position - grid.GetCellCenterWorld(adjacentTile)).sqrMagnitude > 0.001f)
             {
-                Vector2 newPos = Vector2.MoveTowards(transform.position, grid.GetCellCenterWorld(adjacentTile), speed * Time.fixedDeltaTime);
+                Vector2 newPos = Vector2.MoveTowards(transform.position, grid.GetCellCenterWorld(adjacentTile), Speed * Time.fixedDeltaTime);
                 rb.MovePosition(newPos);
                 yield return new WaitForFixedUpdate();
                 if (updatedMap)
@@ -316,7 +330,7 @@ public class Player : MonoBehaviour
         print(heldPercent);
         equipMeterSlider.value = heldPercent;
 
-        speed = heldPercent switch
+        baseSpeed = heldPercent switch
         {
             < 0.24f => 7,
             < 0.49f => 6,

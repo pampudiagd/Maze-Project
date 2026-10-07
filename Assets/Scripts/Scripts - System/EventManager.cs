@@ -18,4 +18,6 @@ public static class EventManager
     public static Action<int> OnScoreChanged;
     public static Action<int> OnHighScoreChanged;
 
+    public static Action<bool, Vector3Int> OnOneWayEnter; 
+
 }
