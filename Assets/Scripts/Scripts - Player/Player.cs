@@ -76,6 +76,7 @@ public class Player : MonoBehaviour
     private Vector3Int dashTarget;
 
     [SerializeField] private bool isMoving = false;
+    [SerializeField] private bool isDashing = false;
     [SerializeField] private bool wantToDash = false;
     private bool updatedMap = false;
     private Rigidbody2D rb;
@@ -183,8 +184,8 @@ public class Player : MonoBehaviour
         if (wantToDash && dashClock <= 0 && baseSpeed >= 4) //speed>=4 makes sure dashing is impossible when overburdened
                                                         //this should be changed to directly check the equip load variable once that exists
             StartCoroutine(Dash());
-        else
-            StartCoroutine(Move());
+        
+        StartCoroutine(Move());
     }
 
     private IEnumerator Move()
@@ -214,7 +215,7 @@ public class Player : MonoBehaviour
 
         if (tilemap.GetColliderType(adjacentTile) == Tile.ColliderType.None)
         {
-            while ((transform.position - grid.GetCellCenterWorld(adjacentTile)).sqrMagnitude > 0.001f)
+            while ((transform.position - grid.GetCellCenterWorld(adjacentTile)).sqrMagnitude > 0.001f && !isDashing)
             {
                 Vector2 newPos = Vector2.MoveTowards(transform.position, grid.GetCellCenterWorld(adjacentTile), Speed * Time.fixedDeltaTime);
                 rb.MovePosition(newPos);
@@ -235,11 +236,10 @@ public class Player : MonoBehaviour
 
     private IEnumerator Dash()
     {
-        if (isMoving || coinCapacity - coinCount == 0)
+        if (isDashing || coinCapacity - coinCount == 0)
             yield break;
-
-        isMoving = true;
-
+        
+        isDashing = true;
         invincibleUntil = Time.time + iDashDuration;
         mySprite.color = Color.red;
 
@@ -247,29 +247,40 @@ public class Player : MonoBehaviour
 
         for (int i = 0; i < dashDistance; i++)
         {
+            adjacentTile = MyGridPos + storedDirection;
             dashTarget = adjacentTile;
-            adjacentTile += storedDirection;
 
-            if (tilemap.GetColliderType(adjacentTile) != Tile.ColliderType.None)
-                break;
-        }
 
-        while ((transform.position - grid.GetCellCenterWorld(dashTarget)).sqrMagnitude > 0.001f)
-        {
-            Vector2 newPos = Vector2.MoveTowards(transform.position, grid.GetCellCenterWorld(dashTarget), dashSpeedMultiplier * Time.fixedDeltaTime);
-            rb.MovePosition(newPos);
-            yield return new WaitForFixedUpdate();
-            if (updatedMap)
+
+
+            while ((transform.position - grid.GetCellCenterWorld(dashTarget)).sqrMagnitude > 0.001f)
             {
-                updatedMap = false;
-                invincibleUntil = 0;
-                break;
+                if (updatedMap)
+                {
+                    updatedMap = false;
+                    invincibleUntil = 0;
+                    break;
+                }
+
+                Vector2 newPos;
+
+                if (tilemap.GetColliderType(adjacentTile) != Tile.ColliderType.None)
+                {
+                    newPos = Vector2.MoveTowards(transform.position, grid.GetCellCenterWorld(MyGridPos), dashSpeedMultiplier * Time.fixedDeltaTime);
+                    rb.MovePosition(newPos);
+                    yield return new WaitForFixedUpdate();
+                    break;
+                }
+
+                newPos = Vector2.MoveTowards(transform.position, grid.GetCellCenterWorld(dashTarget), dashSpeedMultiplier * Time.fixedDeltaTime);
+                rb.MovePosition(newPos);
+                yield return new WaitForFixedUpdate();
             }
         }
 
         dashClock = dashCooldown;
         wantToDash = false;
-        isMoving = false;
+        isDashing = false;
     }
 
     private void ICheck()
@@ -364,7 +375,7 @@ public class Player : MonoBehaviour
         }
         if (myState == PlayerState.Default)
         {
-            if (Input.GetKey(dashKey) && dashClock <= 0)
+            if (Input.GetKey(dashKey) && dashClock <= 0 && baseSpeed != 2)
                 wantToDash = true;
             else if (Input.GetKey(fireKey) && ammoCount > 0 && gunClock <= 0)
                 FireBullet();

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 9039912259243193010}
   m_Layer: 0
   m_Name: Load Zone __
-  m_TagString: Untagged
+  m_TagString: SectorZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -607,8 +607,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   coinsTotal: 0
   coinsRemaining: 0
+  halfAmount: 0
+  halfCoinsCollected: 0
   bankFilled: 0
   completionMark: 0
+  startSector: 0
 --- !u!61 &7454615348065635677
 BoxCollider2D:
   m_ObjectHideFlags: 0

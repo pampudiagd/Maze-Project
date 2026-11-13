@@ -11,6 +11,7 @@ public static class EventManager
     public static Action<Bullet.BulletType> OnCollectPowerup;
     public static Action PursueLogicStart;
     public static Action PursueLogicEnd;
+    public static Action<GameObject> SectorHalfway;
     public static Action SectorCompleted;
     public static Action OnBankFilled;
     public static Action OnPlayerMoved;
@@ -18,6 +19,6 @@ public static class EventManager
     public static Action<int> OnScoreChanged;
     public static Action<int> OnHighScoreChanged;
 
-    public static Action<bool, Vector3Int> OnOneWayEnter; 
+    public static Action<bool, Vector3Int> OnOneWayEnter;
 
 }

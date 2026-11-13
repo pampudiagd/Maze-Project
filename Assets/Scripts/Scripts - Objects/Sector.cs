@@ -7,6 +7,9 @@ public class Sector : MonoBehaviour
     public int coinsTotal;
     public int coinsRemaining;
 
+    public int halfAmount;
+    public bool halfCoinsCollected = false;
+
     public bool bankFilled = false;
     public bool completionMark = false; // Prevents the Sector progressing the win condition again every time its completion is calculated
 
@@ -15,6 +18,7 @@ public class Sector : MonoBehaviour
     public enum SectorCompletionState
     {
         None,
+        HalfCoins,
         AllCoins,
         BankFilled,
         Completed
@@ -38,6 +42,7 @@ public class Sector : MonoBehaviour
     {
         coinsTotal = GetComponentsInChildren<Coin>(true).Length;
         coinsRemaining = coinsTotal;
+        halfAmount = coinsTotal / 2;
         print("Number of coins: " + coinsTotal);
 
         foreach (Coin item in GetComponentsInChildren<Coin>(true))
@@ -51,6 +56,13 @@ public class Sector : MonoBehaviour
     // Determines what state of completion the Sector is in
     public void CalcCompState()
     {
+        if (!halfCoinsCollected && coinsRemaining <= halfAmount)
+        {
+            halfCoinsCollected = true;
+            state = SectorCompletionState.HalfCoins;
+            EventManager.SectorHalfway.Invoke(gameObject);
+        }
+
         switch (coinsRemaining == 0, bankFilled)
         {
             case (false, false):

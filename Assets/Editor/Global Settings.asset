@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Global Settings
   m_EditorClassIdentifier: 
   allowEnemySpawns: 0
-  allowCoins: 0
+  allowCoins: 1
   startWithGun: 1
   gunType: 2

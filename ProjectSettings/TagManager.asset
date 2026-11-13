@@ -11,6 +11,7 @@ TagManager:
   - Coin
   - BankAttack
   - DebugHolder
+  - SectorZone
   layers:
   - Default
   - TransparentFX
@@ -23,7 +24,7 @@ TagManager:
   - Bank
   - Bullet
   - Enemy
-  - 
+  - Player OneWay
   - 
   - 
   - Pickup

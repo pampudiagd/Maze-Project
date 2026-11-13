@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6517806151425038376}
   - component: {fileID: 3197879861075518850}
   - component: {fileID: 8776635795288319184}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: OneWay-Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -100,7 +100,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae941490157902d4b9a58f282bf3724e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  direction: 0
   playerPassThru: 0
 --- !u!61 &8776635795288319184
 BoxCollider2D:
